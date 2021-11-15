@@ -2,6 +2,7 @@ import { useState } from 'react';
 import _ from 'lodash';
 import BugSummary from './BugSummary';
 import { nanoid } from 'nanoid';
+import './BugList.css'
 
 function BugList( {onNavigate, getBug } )  {
   const [bugs, setBugs] = useState([
@@ -21,7 +22,7 @@ function BugList( {onNavigate, getBug } )  {
     },
     {
       _id: nanoid(),
-      title: 'Delta',
+      title: 'Delta Bug',
       author: 'David Jenn',
       dateFormatted: '01/22/2021',
       status: 'open',
@@ -40,13 +41,14 @@ function BugList( {onNavigate, getBug } )  {
       dateFormatted: '01/22/2021',
       status: 'open',
     },
+    
   ]);
 
  
 
   return (
     
-    <div className="p-3 border border-dark bg-dark text-light">
+    <div className="p-3 text-light">
       <h1 className="text-center mb-3">Bug List</h1>
       <div className="mb-3">
         <label htmlFor="bugSearch" className="visually-hidden">
@@ -57,7 +59,7 @@ function BugList( {onNavigate, getBug } )  {
           Search
         </button>
       </div>
-      <div className="">Show/Hide Filters</div>
+      
       <div className="filterListContainer d-flex row">
         <div className="filterContainer mb-3 col-md-3">
           <div className="filterItem">
@@ -121,7 +123,7 @@ function BugList( {onNavigate, getBug } )  {
             </select>
           </div>
         </div>
-        <div className="bugSummaries col col-md-9 bg-secondary p-3">
+        <div className="bugSummariesSection col col-md-9 p-3">
           <div>
             {_.map(bugs, (bug) => (
               <BugSummary 

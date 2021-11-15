@@ -3,43 +3,40 @@ import _ from 'lodash';
 import UserSummary from './UserSummary';
 import { nanoid } from 'nanoid';
 
-function UserList( {onNavigate} )  {
+function UserList({ onNavigate, getUser }) {
   const [users, setUsers] = useState([
     {
       _id: nanoid(),
       fullName: 'David Jenn',
       email: 'djenn@gmail.com',
       role: 'DEV',
-      createdOn: '12/11/2020'
-      
+      createdOn: '12/11/2020',
     },
     {
       _id: nanoid(),
       fullName: 'John Doe',
       email: 'jdoe@gmail.com',
       role: 'QA',
-      createdOn: '12/23/2020'
+      createdOn: '12/23/2020',
     },
     {
       _id: nanoid(),
       fullName: 'John Smith',
       email: 'jmith@gmail.com',
       role: 'BA',
-      createdOn: '03/22/2021'
+      createdOn: '03/22/2021',
     },
     {
       _id: nanoid(),
       fullName: 'Steve Price',
       email: 'sprice@gmail.com',
       role: 'PM',
-      createdOn: '04/24/2021'
+      createdOn: '04/24/2021',
     },
-    
   ]);
 
   return (
-    
-    <div className="p-3 border border-dark bg-dark text-light">
+    <div className="p-3 text-light">
       <h1 className="text-center mb-3">User List</h1>
       <div className="mb-3">
         <label htmlFor="userSearch" className="visually-hidden">
@@ -71,7 +68,7 @@ function UserList( {onNavigate} )  {
               Min Age
             </label>
             <select id="minAgeFilter" name="minAgeFilter" className="form-select border border-dark">
-            <option value="all">All</option>
+              <option value="all">All</option>
               <option value="oneHour">1-day</option>
               <option value="fourHours">1-week</option>
               <option value="twelveHours">1-month</option>
@@ -105,10 +102,10 @@ function UserList( {onNavigate} )  {
             </select>
           </div>
         </div>
-        <div className="userSummaries col col-md-9 bg-secondary p-3">
+        <div className="userSummariesSection col col-md-9 p-3">
           <div>
             {_.map(users, (user) => (
-              <UserSummary key={user._id} user={user} />
+              <UserSummary key={user._id} user={user} onNavigate={onNavigate} getUser={getUser} />
             ))}
           </div>
         </div>

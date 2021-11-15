@@ -1,14 +1,15 @@
-.UserSummary {
+.BugSummary {
   color: var(--bs-dark);
   background-color: var(--bs-light);
 }
 
-.UserSummary:hover {
+.BugSummary:hover,
+.BugSummary:focus {
   cursor: pointer;
   color: var(--bs-light);
   background-color: var(--bs-dark);
 }
 
-.userSummariesSection {
+.bugSummariesSection {
   background-color: lightgray
 }

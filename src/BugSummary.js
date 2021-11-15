@@ -1,3 +1,5 @@
+import './BugSummary.css'
+
 function BugSummary({ bug, onNavigate, getBug }) {
   
    function showEditPage(evt, bug) {
@@ -8,7 +10,7 @@ function BugSummary({ bug, onNavigate, getBug }) {
   return (
     <div
       id={`bug-${bug._id}`}
-      className=" d-flex mb-1 flex-grow-1 flex-shrink-1 flex-column flex-sm-row border border-dark p-1 bg-light text-dark"
+      className="BugSummary d-flex mb-1 flex-grow-1 flex-shrink-1 flex-column flex-sm-row border border-dark p-1"
       onClick={(evt) => showEditPage(evt, bug)} 
     >
       <div className="me-3 flex-grow-1 flex-shrink-1">{bug.title}</div>

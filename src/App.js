@@ -4,11 +4,14 @@ import UserList from './UserList';
 import Login from './Login';
 import Register from './Register';
 import BugEditor from './BugEditor';
+import UserEditor from './UserEditor'
+
 
 
 function App() {
   const [screen, setScreen] = useState('/login');
   const [bug, setBug] = useState({});
+  const [user, setUser] = useState({});
 
   function onNavigate(evt, href) {
     evt.preventDefault();
@@ -18,9 +21,13 @@ function App() {
   function getBug(evt, bug) {
     setBug(bug);
   }
+
+  function getUser (evt, user) {
+    setUser(user);
+  }
   return (
-    <div className="d-flex flex-column min-vh-100">
-      <header>
+    <div className="d-flex flex-column min-vh-100 bg-dark">
+      <header className="mb-3">
         <nav className="bg-light navbar navbar-light navbar-expand-sm p-3">
           <a className="navbar-brand d-flex align-items-center" href="/">
             <div>Issue Tracker</div>
@@ -77,14 +84,15 @@ function App() {
         </nav>
       </header>
 
-      <main className="flex-grow-1 container">
-        {screen === '/login' && <Login onNavigate={onNavigate} />} 
+      <main className="container flex-grow-1 ">
+        {screen === '/login' && <Login onNavigate={onNavigate}/>} 
         {screen === '/register' && <Register onNavigate={onNavigate} />} 
         {screen === '/bug/list' && <BugList onNavigate={onNavigate} getBug={getBug} />}
-        {screen === '/user/list' && <UserList onNavigate={onNavigate} />}
+        {screen === '/user/list' && <UserList onNavigate={onNavigate} getUser={getUser} />}
         {screen === `/bug/edit/${bug._id}` && <BugEditor bug={bug} onNavigate={onNavigate} />}
+        {screen === `/user/edit/${user._id}` && <UserEditor user={user} onNavigate={onNavigate} />}
       </main>
-      <footer className="bg-light">
+      <footer className="bg-light p-3">
         <div>Issue Tracker 2021</div>
       </footer>
     </div>
