@@ -1,22 +1,49 @@
-import './BugSummary.css'
+import { Link } from 'react-router-dom';
+import moment from 'moment';
 
-function BugSummary({ bug, onNavigate, getBug }) {
+import './BugSummary.css';
+
+function BugSummary( {bug} ) {
+
   
-   function showEditPage(evt, bug) {
-     getBug(evt, bug);
-     onNavigate(evt, `/bug/edit/${bug._id}`);
-   }
+  function getClassificationClasses() {
+    const classes =
+      bug.classification === 'unclassified'
+        ? 'me-2 badge bg-warning'
+        : bug.classification === 'approved'
+        ? 'me-2 badge bg-primary'
+        : bug.classification === 'unapproved' || 'duplicate'
+        ? 'me-2 badge bg-danger'
+        : 'bg-secondary';
+
+    return classes;
+  }
+
+  function getStatusClasses() {
+    const classes =
+      bug.closed === false || 'false'  ? 'me-2 badge bg-primary' : bug.closed === true || 'true' ? 'me-2 badge bg-danger' : '';
+    return classes;
+  }
 
   return (
-    <div
-      id={`bug-${bug._id}`}
-      className="BugSummary d-flex mb-1 flex-grow-1 flex-shrink-1 flex-column flex-sm-row border border-dark p-1"
-      onClick={(evt) => showEditPage(evt, bug)} 
-    >
-      <div className="me-3 flex-grow-1 flex-shrink-1">{bug.title}</div>
-      <div className="me-3 flex-shrink-0">{bug.author}</div>
-      <div className="me-3 flex-shrink-1">{bug.dateFormatted}</div>
-      <div className="me-3 flex-shrink-1">{bug.status}</div>
+    <div className="card border-dark mb-2 text-dark">
+      <div className="card-body">
+        <span className="card-title">
+          <Link to={`/pet/${bug._id}`}>{bug.title}</Link>
+        </span>
+        <div>
+          <span className={getClassificationClasses()}>{bug.classification}</span>
+          <span className={getStatusClasses()}>{bug.closed ? 'closed' : 'open'}</span>
+        </div>
+        <div>
+          <span>Assigned to {bug.title}</span>
+        </div>
+      </div>
+      <div className="card-footer">
+        <span>
+          Created by {bug.title} on {bug.title}
+        </span>
+      </div>
     </div>
   );
 }

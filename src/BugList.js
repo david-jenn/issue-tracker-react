@@ -1,53 +1,94 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import _ from 'lodash';
 import BugSummary from './BugSummary';
 import { nanoid } from 'nanoid';
-import './BugList.css'
+import axios from 'axios';
+//import './BugList.css'
 
-function BugList( {onNavigate, getBug } )  {
-  const [bugs, setBugs] = useState([
-    {
-      _id: nanoid(),
-      title: 'Alpha Bug',
-      author: 'David Jenn',
-      dateFormatted: '01/22/2021',
-      status: 'open',
-    },
-    {
-      _id: nanoid(),
-      title: 'Beta Bug',
-      author: 'John Doe',
-      dateFormatted: '01/22/2021',
-      status: 'open',
-    },
-    {
-      _id: nanoid(),
-      title: 'Delta Bug',
-      author: 'David Jenn',
-      dateFormatted: '01/22/2021',
-      status: 'open',
-    },
-    {
-      _id: nanoid(),
-      title: 'Echo Bug',
-      author: 'Steve Price',
-      dateFormatted: '01/22/2021',
-      status: 'open',
-    },
-    {
-      _id: nanoid(),
-      title: 'Foxtrot Bug',
-      author: 'John Doe',
-      dateFormatted: '01/22/2021',
-      status: 'open',
-    },
-    
-  ]);
+function BugList({ auth, showError, showSuccess }) {
+  // const [bugs, setBugs] = useState([
+  //   {
+  //     _id: nanoid(),
+  //     title: 'Alpha Bug',
+  //     author: 'David Jenn',
+  //     dateFormatted: '01/22/2021',
+  //     status: 'open',
+  //     classification: 'unclassified',
+  //     userAssigned: 'John Doe'
+  //   },
+  //   {
+  //     _id: nanoid(),
+  //     title: 'Beta Bug',
+  //     author: 'John Doe',
+  //     dateFormatted: '01/22/2021',
+  //     status: 'open',
+  //     classification: 'approved',
+  //     userAssigned: 'John Doe'
+  //   },
+  //   {
+  //     _id: nanoid(),
+  //     title: 'Delta Bug',
+  //     author: 'David Jenn',
+  //     dateFormatted: '01/22/2021',
+  //     status: 'closed',
+  //     classification: 'duplicate',
+  //     userAssigned: 'John Doe'
+  //   },
+  //   {
+  //     _id: nanoid(),
+  //     title: 'Echo Bug',
+  //     author: 'Steve Price',
+  //     dateFormatted: '01/22/2021',
+  //     status: 'open',
+  //     classification: 'unapproved',
+  //     userAssigned: 'John Doe'
+  //   },
+  //   {
+  //     _id: nanoid(),
+  //     title: 'Foxtrot Bug',
+  //     author: 'John Doe',
+  //     dateFormatted: '01/22/2021',
+  //     status: 'open',
+  //     classification: 'unclassified',
+  //     userAssigned: 'John Doe'
+  //   },
 
- 
+  // ]);
+
+  const [pending, setPending] = useState(false);
+  const [bugs, setBugs] = useState(null);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  useEffect(() => {
+    setPending(true);
+    setError('');
+    axios(`${process.env.REACT_APP_API_URL}/api/bug/list`, {
+      method: 'get',
+      params: { pageSize: 1000 },
+      headers: {
+        authorization: `Bearer ${auth?.token}`
+      },
+      
+      
+    })
+      .then((res) => {
+        console.log(res.data);
+        setPending(false);
+        if (_.isArray(res.data)) {
+        setBugs(res.data);
+        } else {
+          setError('Expected an array')
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        setPending(false);
+        setError(err.message);
+      });
+  }, [auth]);
 
   return (
-    
     <div className="p-3 text-light">
       <h1 className="text-center mb-3">Bug List</h1>
       <div className="mb-3">
@@ -59,7 +100,7 @@ function BugList( {onNavigate, getBug } )  {
           Search
         </button>
       </div>
-      
+
       <div className="filterListContainer d-flex row">
         <div className="filterContainer mb-3 col-md-3">
           <div className="filterItem">
@@ -126,13 +167,7 @@ function BugList( {onNavigate, getBug } )  {
         <div className="bugSummariesSection col col-md-9 p-3">
           <div>
             {_.map(bugs, (bug) => (
-              <BugSummary 
-              key={bug._id}
-               bug={bug}
-               onNavigate={onNavigate} 
-               getBug={getBug}
-               />
-               
+              <BugSummary key={bug._id} bug={bug} />
             ))}
           </div>
         </div>
