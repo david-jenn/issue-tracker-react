@@ -6,18 +6,23 @@ import { moment } from 'moment';
 
 import './BugEditor.css';
 import InputField from './InputField';
+import TextAreaField from './TextAreaField';
 
 function BugEditor({ auth, showError }) {
   const { bugId } = useParams();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [stepsToReproduce, setStepsToReproduce] = useState('');
+  const [classification, setClassification] = useState('');
   const [assignedTo, setAssignedTo] = useState('');
   const [closed, setClosed] = useState(null);
   const [pending, setPending] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState('');
   const [bug, setBug] = useState(null);
+
+  const canEditAnyBug = auth?.payload?.permissions?.editAnyBug;
+  const canClassifyBug = auth?.payload?.permissions?.classifyBug;
 
   useEffect(() => {
     setPending(true);
@@ -34,10 +39,10 @@ function BugEditor({ auth, showError }) {
         setLoaded(true);
         console.log(res.data);
         setBug(res.data);
-        console.log(bug);
         setTitle(res.data.title);
         setDescription(res.data.description);
         setStepsToReproduce(res.data.stepsToReproduce);
+        setClassification(res.data.classification);
         setAssignedTo(res.data.userAssigned?.fullName);
         setClosed(res.data.closed);
         console.log(title);
@@ -53,6 +58,15 @@ function BugEditor({ auth, showError }) {
     const newValue = evt.currentTarget.value;
     setValue(newValue);
     console.log(newValue);
+    console.log(typeof newValue);
+  }
+
+  function booleanInputChange(evt, setValue) {
+    const newValue = evt.currentTarget.value;
+    const booleanFlag = newValue.toLowerCase() === 'true' ? true : newValue.toLowerCase() === 'false' ? false : null;
+    setValue(booleanFlag);
+    console.log(booleanFlag);
+    console.log(typeof booleanFlag);
   }
 
   function onSendEditReq(evt) {
@@ -60,7 +74,7 @@ function BugEditor({ auth, showError }) {
 
     axios(`${process.env.REACT_APP_API_URL}/api/bug/${bugId}`, {
       method: 'put',
-      data: {title, description, stepsToReproduce },
+      data: { title, description, stepsToReproduce },
       headers: {
         authorization: `Bearer ${auth?.token}`,
       },
@@ -70,14 +84,14 @@ function BugEditor({ auth, showError }) {
       })
       .catch((err) => {
         console.log(err);
-      })
+      });
   }
 
   return (
     <div className="sectionContainer">
       {!auth && <h1 className="text-danger">You do not have permission</h1>}
 
-      {auth && 
+      {auth && (
         <div>
           <h1>{bug?.title}</h1>
 
@@ -90,43 +104,30 @@ function BugEditor({ auth, showError }) {
           <div className="pageRow row">
             <div className="bugInfoSection col-md-6">
               <form id="bug-edit-form" action="/issues" method="put">
-                <div className="form-section mb-3">
-                  <InputField
-                    label="Title"
-                    id="bugEditor-title"
-                    type="text"
-                    placeholder="name@example.com"
-                    value={title}
-                    onChange={(evt) => onInputChange(evt, setTitle)}
-                  />
-                </div>
+                <InputField
+                  label="Title"
+                  id="bugEditor-title"
+                  type="text"
+                  value={title}
+                  onChange={(evt) => onInputChange(evt, setTitle)}
+                />
+                <TextAreaField
+                  label="Description"
+                  id="bugEditor-description"
+                  name="bugEditor-description"
+                  rows="5"
+                  value={description}
+                  onChange={(evt) => onInputChange(evt, setDescription)}
+                />
 
-                <div className="form-section mb-3">
-                  <label htmlFor="bugDescription" className="form-label">
-                    Description
-                  </label>
-                  <textarea
-                    name="bugDescription"
-                    id="bugDescription"
-                    className="form-control"
-                    rows="5"
-                    value={description}
-                    onChange={(evt) => onInputChange(evt, setDescription)}
-                  ></textarea>
-                </div>
-                <div className="form-section mb-3">
-                  <label htmlFor="bugSteps" className="form-label">
-                    Steps To Reproduce
-                  </label>
-                  <textarea
-                    name="bugSteps"
-                    id="bugSteps"
-                    className="form-control"
-                    rows="5"
-                    value={stepsToReproduce}
-                    onChange={(evt) => onInputChange(evt, setStepsToReproduce)}
-                  ></textarea>
-                </div>
+                <TextAreaField
+                  label="Steps To Reproduce"
+                  id="BugEditor-stepsToReproduce"
+                  name="BugEditor-stepsToReproduce"
+                  rows="5"
+                  value={stepsToReproduce}
+                  onChange={(evt) => onInputChange(evt, setStepsToReproduce)}
+                />
 
                 <div className="classificationStatusAssignContainer mb-3">
                   <div className="classificationSection border-bottom border-light p-3 mb-3">
@@ -136,9 +137,13 @@ function BugEditor({ auth, showError }) {
                         className="form-check-input"
                         type="radio"
                         name="classificationRadio"
-                        id="devRoleCheck"
+                        id="unclassifiedCheck"
+                        value="unclassified"
+                        disabled={!canClassifyBug}
+                        checked={classification === 'unclassified' ? true : false}
+                        onChange={(evt) => onInputChange(evt, setClassification)}
                       ></input>
-                      <label className="devRoleCheck" htmlFor="devRoleCheck">
+                      <label className="form-label" htmlFor="unclassifiedCheck">
                         Unclassified
                       </label>
                     </div>
@@ -147,9 +152,12 @@ function BugEditor({ auth, showError }) {
                         className="form-check-input"
                         type="radio"
                         name="classificationRadio"
-                        id="qaRoleCheck"
+                        id="duplicateCheck"
+                        value="duplicate"
+                        checked={classification === 'duplicate' ? true : false}
+                        onChange={(evt) => onInputChange(evt, setClassification)}
                       ></input>
-                      <label className="qaRoleCheck" htmlFor="qaRoleCheck">
+                      <label className="form-label" htmlFor="duplicateCheck">
                         Duplicate
                       </label>
                     </div>
@@ -158,9 +166,12 @@ function BugEditor({ auth, showError }) {
                         className="form-check-input"
                         type="radio"
                         name="classificationRadio"
-                        id="baRoleCheck"
+                        id="approvedCheck"
+                        value="approved"
+                        checked={classification === 'approved' ? true : false}
+                        onChange={(evt) => onInputChange(evt, setClassification)}
                       ></input>
-                      <label className="baRoleCheck" htmlFor="baRoleCheck">
+                      <label className="form-label" htmlFor="approvedCheck">
                         Approved
                       </label>
                     </div>
@@ -169,9 +180,12 @@ function BugEditor({ auth, showError }) {
                         className="form-check-input"
                         type="radio"
                         name="classificationRadio"
-                        id="pmRoleCheck"
+                        id="unapprovedCheck"
+                        value="unapproved"
+                        checked={classification === 'unapproved' ? true : false}
+                        onChange={(evt) => onInputChange(evt, setClassification)}
                       ></input>
-                      <label className="pmRoleCheck" htmlFor="pmRoleCheck">
+                      <label className="form-label" htmlFor="unapprovedCheck">
                         Unapproved
                       </label>
                     </div>
@@ -181,14 +195,29 @@ function BugEditor({ auth, showError }) {
                   <div className="statusSection border-bottom border-light p-3 mb-3">
                     <h3>Status</h3>
                     <div className="form-check">
-                      <input className="form-check-input" type="radio" name="statusRadio" id="openBug" />
-                      <label className="openBug" htmlFor="openBug">
+                      <input
+                        className="form-check-input"
+                        type="radio"
+                        name="statusRadio"
+                        id="openCheck"
+                        value={false}
+                        checked={!closed ? true : false}
+                        onChange={(evt) => booleanInputChange(evt, setClosed)}
+                      ></input>
+                      <label className="form-label" htmlFor="openCheck">
                         Open
                       </label>
                     </div>
                     <div className="form-check mb-3">
-                      <input className="form-check-input" type="radio" name="statusRadio" id="closedBug" />
-                      <label className="closeBug" htmlFor="closedBug">
+                      <input
+                        className="form-check-input"
+                        type="radio"
+                        name="statusRadio"
+                        id="closedCheck"
+                        value={true}
+                        onChange={(evt) => booleanInputChange(evt, setClosed)}
+                      ></input>
+                      <label className="form-label" htmlFor="closedCheck">
                         Closed
                       </label>
                     </div>
@@ -214,7 +243,12 @@ function BugEditor({ auth, showError }) {
                   </div>
                 </div>
                 <div className="form-section">
-                  <button id="bug-edit-btn" type="submit" className="btn btn-primary mb-3 me-3" onClick={(evt) => onSendEditReq(evt)}>
+                  <button
+                    id="bug-edit-btn"
+                    type="submit"
+                    className="btn btn-primary mb-3 me-3"
+                    onClick={(evt) => onSendEditReq(evt)}
+                  >
                     Confirm Changes
                   </button>
                   <button id="cancel-bug-edit-btn" type="button" className="btn btn-danger mb-3">
@@ -293,7 +327,7 @@ function BugEditor({ auth, showError }) {
             </div>
           </div>
         </div>
-      }
+      )}
     </div>
   );
 }
