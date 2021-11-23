@@ -32,6 +32,7 @@ function App() {
 
   function showError(message) {
     toast(message, { type: 'error', position: 'bottom-right' })
+   
   }
   
   function showSuccess(message) {
@@ -48,7 +49,7 @@ function App() {
           <Route path="/login" element={ <Login onLogin={onLogin} showError={showError}/> } />
           <Route path="/register" element={<Register showError={showError} onLogin={onLogin} />} />
           <Route path="/bug/list" element={<BugList auth={auth} />} />
-          <Route path="/bug/:bugId" element={<BugEditor />} />
+          <Route path="/bug/:bugId" element={<BugEditor auth={auth} showError={showError} />} />
           <Route path="/user/list" element={<UserList />} />
           <Route path="/user/:userId" element={<UserEditor />} />
           <Route path="*" element={<NotFound />} />

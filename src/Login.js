@@ -33,6 +33,9 @@ function Login({ onLogin, showError }) {
     setSuccess('');
     setPending(true);
 
+    console.log(process.env.REACT_APP_API_URL);
+   
+
     if (emailError || passwordError) {
       setError('Please fix errors above');
       showError('Please fix errors above');
