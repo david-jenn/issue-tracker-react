@@ -3,29 +3,44 @@ import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useEffect } from 'react/cjs/react.development';
 import { moment } from 'moment';
+import _ from 'lodash';
 
 import './BugEditor.css';
 import InputField from './InputField';
 import TextAreaField from './TextAreaField';
 
-function BugEditor({ auth, showError }) {
+function BugEditor({ auth, showError, showSuccess }) {
   const { bugId } = useParams();
+  const [ users, setUsers ] = useState([]);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [stepsToReproduce, setStepsToReproduce] = useState('');
   const [classification, setClassification] = useState('');
   const [assignedTo, setAssignedTo] = useState('');
   const [closed, setClosed] = useState(null);
-  const [pending, setPending] = useState(false);
+
+  const [pageLoadPending, setPageLoadPending] = useState(false);
+  const [editPending, setEditPending] = useState(false);
+  const [classificationPending, setClassificationPending] = useState(false);
+  const [statusPending, setStatusPending] = useState(false);
+
+  const [editSuccess, setEditSuccess] = useState('');
+  const [editError, setEditError] = useState('');
+  const [classificationSuccess, setClassificationSuccess] = useState('');
+  const [classificationError, setClassificationError] = useState('');
+  const [statusSuccess, setStatusSuccess] = useState('');
+  const [statusError, setStatusError] = useState('');
+
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState('');
   const [bug, setBug] = useState(null);
 
-  const canEditAnyBug = auth?.payload?.permissions?.editAnyBug;
+  const canCloseBug = auth?.payload?.permissions?.closeBug;
   const canClassifyBug = auth?.payload?.permissions?.classifyBug;
 
+
   useEffect(() => {
-    setPending(true);
+    setPageLoadPending(true);
     setLoaded(false);
 
     axios(`${process.env.REACT_APP_API_URL}/api/bug/${bugId}`, {
@@ -35,7 +50,7 @@ function BugEditor({ auth, showError }) {
       },
     })
       .then((res) => {
-        setPending(false);
+        setPageLoadPending(false);
         setLoaded(true);
         console.log(res.data);
         setBug(res.data);
@@ -44,33 +59,156 @@ function BugEditor({ auth, showError }) {
         setStepsToReproduce(res.data.stepsToReproduce);
         setClassification(res.data.classification);
         setAssignedTo(res.data.userAssigned?.fullName);
-        setClosed(res.data.closed);
+        
+        setClosed(res.data.closed === true ? 'true' : res.data.closed === false ? 'false' : null);
         console.log(title);
       })
       .catch((err) => {
         console.error(err);
+        setPageLoadPending(false);
         setError(err.message);
         showError(err.message);
       });
+
+
+      axios(`${process.env.REACT_APP_API_URL}/api/user/list`, {
+        method: 'get',
+        params: { pageSize: 1000 },
+        headers: {
+          authorization: `Bearer ${auth?.token}`
+        },
+        
+        
+      })
+        .then((res) => {
+          console.log(res.data);
+          
+          if (_.isArray(res.data)) {
+          setUsers(res.data);
+          } else {
+            setError('Expected an array')
+          }
+          console.log(_.map(users, (x) => x.fullName))
+        })
+        .catch((err) => {
+          console.log(err);
+         
+          setError(err.message);
+        });
   }, [auth, bugId, showError]);
 
   function onInputChange(evt, setValue) {
     const newValue = evt.currentTarget.value;
     setValue(newValue);
     console.log(newValue);
-    console.log(typeof newValue);
+    
   }
 
-  function booleanInputChange(evt, setValue) {
-    const newValue = evt.currentTarget.value;
-    const booleanFlag = newValue.toLowerCase() === 'true' ? true : newValue.toLowerCase() === 'false' ? false : null;
-    setValue(booleanFlag);
-    console.log(booleanFlag);
-    console.log(typeof booleanFlag);
+  function onSendCloseReq(evt) {
+    evt.preventDefault();
+    setEditError('');
+    setEditSuccess('');
+    setClassificationError('');
+    setClassificationSuccess('');
+    setStatusError('');
+    setStatusSuccess('');
+
+    setStatusPending(true);
+
+    axios(`${process.env.REACT_APP_API_URL}/api/bug/${bugId}/close`, {
+      method: 'put',
+      data: { closed },
+      headers: {
+        authorization: `Bearer ${auth?.token}`,
+      },
+    })
+      .then((res) => {
+        console.log(res);
+        setStatusPending(false);
+        setStatusSuccess(res.data.message);
+        showSuccess(res.data.message);
+      })
+      .catch((err) => {
+        console.log(err);
+        const resError = err?.response?.data?.error;
+
+        if (resError) {
+          if (typeof resError === 'string') {
+            setError(resError);
+            showError(resError)
+            console.log(resError)
+          } else if (resError.details) {
+            setError(_.map(resError.details, (x) => <div>{x.message}</div>));
+            showError(resError)
+          } else {
+            setError(JSON.stringify(resError));
+          }
+        } else {
+          setError(err.message);
+          
+        }
+        
+      });
+  }
+
+  function onSendClassifyReq(evt) {
+    evt.preventDefault();
+    setEditError('');
+    setEditSuccess('');
+    setClassificationError('');
+    setClassificationSuccess('');
+    setStatusError('');
+    setStatusSuccess('');
+
+    setClassificationPending(true);
+
+    axios(`${process.env.REACT_APP_API_URL}/api/bug/${bugId}/classify`, {
+      method: 'put',
+      data: { classification },
+      headers: {
+        authorization: `Bearer ${auth?.token}`,
+      },
+    })
+      .then((res) => {
+        console.log(res);
+
+        setClassificationPending(false);
+        setClassificationSuccess(res.data.message);
+
+        showSuccess(res.data.message);
+      })
+      .catch((err) => {
+        console.log(err);
+        setClassificationPending(false);
+        const resError = err?.response?.data?.error;
+
+        if (resError) {
+          if (typeof resError === 'string') {
+            setClassificationError(resError);
+            showError(resError);
+            console.log(resError);
+          } else if (resError.details) {
+            setClassificationError(_.map(resError.details, (x) => <div>{x.message}</div>));
+            showError(resError);
+          } else {
+            setError(JSON.stringify(resError));
+          }
+        } else {
+          setError(err.message);
+          showError(err.message);
+        }
+      });
   }
 
   function onSendEditReq(evt) {
     evt.preventDefault();
+    setEditPending(true);
+    setEditError('');
+    setEditSuccess('');
+    setClassificationError('');
+    setClassificationSuccess('');
+    setStatusError('');
+    setStatusSuccess('');
 
     axios(`${process.env.REACT_APP_API_URL}/api/bug/${bugId}`, {
       method: 'put',
@@ -80,12 +218,36 @@ function BugEditor({ auth, showError }) {
       },
     })
       .then((res) => {
+        setEditPending(false);
         console.log(res);
+        showSuccess(res.data.message);
+        setEditSuccess(res.data.message);
       })
       .catch((err) => {
-        console.log(err);
+        setEditPending(false);
+        const resError = err?.response?.data?.error;
+        if (resError) {
+          if (typeof resError === 'string') {
+            setEditError(resError);
+            showError(resError);
+          } else if (resError.details) {
+            setEditError(_.map(resError.details, (x) => <div>{x.message}</div>));
+            showError(_.map(resError.details, (x) => x.message));
+            for (const detail of resError.details) {
+              showError(detail.message);
+            }
+          } else {
+            setEditError(JSON.stringify(resError));
+            showError(JSON.stringify(resError));
+          }
+        } else {
+          setEditError(err.message);
+          showError('error');
+        }
       });
   }
+
+  
 
   return (
     <div className="sectionContainer">
@@ -103,7 +265,7 @@ function BugEditor({ auth, showError }) {
 
           <div className="pageRow row">
             <div className="bugInfoSection col-md-6">
-              <form id="bug-edit-form" action="/issues" method="put">
+              <form id="bug-edit-form" className="border-bottom border-light mb-3" action="/issues" method="put">
                 <InputField
                   label="Title"
                   id="bugEditor-title"
@@ -128,9 +290,29 @@ function BugEditor({ auth, showError }) {
                   value={stepsToReproduce}
                   onChange={(evt) => onInputChange(evt, setStepsToReproduce)}
                 />
+                <div className="form-section">
+                  <button
+                    id="bug-edit-btn"
+                    type="submit"
+                    className="btn btn-primary mb-3 me-3"
+                    onClick={(evt) => onSendEditReq(evt)}
+                  >
+                    Confirm Changes
+                  </button>
 
-                <div className="classificationStatusAssignContainer mb-3">
-                  <div className="classificationSection border-bottom border-light p-3 mb-3">
+                  {editPending && (
+                    <div className="spinner-border text-primary" role="status">
+                      <span className="visually-hidden">Loading...</span>
+                    </div>
+                  )}
+                  {editSuccess && <div className="text-success">{editSuccess}</div>}
+                  {editError && <div className="text-danger">{editError}</div>}
+                </div>
+              </form>
+
+              <div className="classificationStatusAssignContainer mb-3">
+                <div className="classificationSection border-bottom border-light p-3 mb-3">
+                  <form id="bug-classify-form" action="/issues" method="put">
                     <h3>Classification</h3>
                     <div className="form-check">
                       <input
@@ -154,6 +336,7 @@ function BugEditor({ auth, showError }) {
                         name="classificationRadio"
                         id="duplicateCheck"
                         value="duplicate"
+                        disabled={!canClassifyBug}
                         checked={classification === 'duplicate' ? true : false}
                         onChange={(evt) => onInputChange(evt, setClassification)}
                       ></input>
@@ -168,6 +351,7 @@ function BugEditor({ auth, showError }) {
                         name="classificationRadio"
                         id="approvedCheck"
                         value="approved"
+                        disabled={!canClassifyBug}
                         checked={classification === 'approved' ? true : false}
                         onChange={(evt) => onInputChange(evt, setClassification)}
                       ></input>
@@ -182,6 +366,7 @@ function BugEditor({ auth, showError }) {
                         name="classificationRadio"
                         id="unapprovedCheck"
                         value="unapproved"
+                        disabled={!canClassifyBug}
                         checked={classification === 'unapproved' ? true : false}
                         onChange={(evt) => onInputChange(evt, setClassification)}
                       ></input>
@@ -189,10 +374,30 @@ function BugEditor({ auth, showError }) {
                         Unapproved
                       </label>
                     </div>
+                    {canClassifyBug && (
+                      <button
+                        id="bug-classify-btn"
+                        type="submit"
+                        className="btn btn-primary mb-3 me-3"
+                        disabled={!canClassifyBug}
+                        onClick={(evt) => onSendClassifyReq(evt)}
+                      >
+                        Confirm Classification
+                      </button>
+                    )}
+                    {classificationPending && (
+                      <div className="spinner-border text-primary" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                      </div>
+                    )}
+                    {classificationSuccess && <div className="text-success">{classificationSuccess}</div>}
+                    {classificationError && <div className="text-danger">{classificationError}</div>}
 
                     <div className="muteText">Classified on 01/01/2021 by John Doe</div>
-                  </div>
-                  <div className="statusSection border-bottom border-light p-3 mb-3">
+                  </form>
+                </div>
+                <div className="statusSection border-bottom border-light p-3 mb-3">
+                  <form id="bug-status-form" action="/issues" method="put">
                     <h3>Status</h3>
                     <div className="form-check">
                       <input
@@ -200,9 +405,10 @@ function BugEditor({ auth, showError }) {
                         type="radio"
                         name="statusRadio"
                         id="openCheck"
-                        value={false}
-                        checked={!closed ? true : false}
-                        onChange={(evt) => booleanInputChange(evt, setClosed)}
+                        value="false"
+                        disabled={!canCloseBug}
+                        onChange={(evt) => onInputChange(evt, setClosed)}
+                        checked={closed === false ? true : closed === 'false' ? true : false}
                       ></input>
                       <label className="form-label" htmlFor="openCheck">
                         Open
@@ -214,48 +420,54 @@ function BugEditor({ auth, showError }) {
                         type="radio"
                         name="statusRadio"
                         id="closedCheck"
-                        value={true}
-                        onChange={(evt) => booleanInputChange(evt, setClosed)}
+                        disabled={!canCloseBug}
+                        checked={closed === true ? true : closed === 'true' ? true : false}
+                        value="true"
+                        onChange={(evt) => onInputChange(evt, setClosed)}
                       ></input>
                       <label className="form-label" htmlFor="closedCheck">
                         Closed
                       </label>
                     </div>
+                    {canCloseBug && (
+                      <button
+                        id="bug-close-btn"
+                        type="submit"
+                        className="btn btn-primary mb-3 me-3"
+                        disabled={!canCloseBug}
+                        onClick={(evt) => onSendCloseReq(evt)}
+                      >
+                        Confirm Status
+                      </button>
+                    )}
+                    {statusSuccess && <div className="text-success">{statusSuccess}</div>}
+                    {statusError && <div className="text-danger">{statusError}</div>}
+
+                    {statusPending && (
+                      <div className="spinner-border text-primary" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                      </div>
+                    )}
+
                     <div className="muteText">Closed on 01/01/2021 by John Doe</div>
-                  </div>
-                  <div className="userAssignedSection p-3">
-                    <h3>Assigned User</h3>
-
-                    <div className="employeeSearchContainer">
-                      <label htmlFor="employeeAssign" className="form-label">
-                        Select User
-                      </label>
-                      <select id="employeeAssign" name="employeeAssign" className="form-select border border-dark mb-3">
-                        <option value="johndoe">John Doe</option>
-                        <option value="davidjenn">David Jenn</option>
-                        <option value="johnsmith">John Smith</option>
-                        <option value="steveprice">Steve Price</option>
-                      </select>
-                    </div>
-                    <div>Assigned to John Doe </div>
-
-                    <div className="muteText">Assigned on 01/01/2021 by John Doe </div>
-                  </div>
+                  </form>
                 </div>
-                <div className="form-section">
-                  <button
-                    id="bug-edit-btn"
-                    type="submit"
-                    className="btn btn-primary mb-3 me-3"
-                    onClick={(evt) => onSendEditReq(evt)}
-                  >
-                    Confirm Changes
-                  </button>
-                  <button id="cancel-bug-edit-btn" type="button" className="btn btn-danger mb-3">
-                    Cancel Changes
-                  </button>
+                <div className="userAssignedSection p-3">
+                  <h3>Assigned User</h3>
+
+                  <div className="employeeSearchContainer">
+                    <label htmlFor="employeeAssign" className="form-label">
+                      Select User
+                    </label>
+                    <select id="employeeAssign" name="employeeAssign" className="form-select border border-dark mb-3" children={_.map(users, (x) => <option>{x.fullName}</option>)}>
+                     
+                    </select>
+                  </div>
+                  <div>Assigned to John Doe </div>
+
+                  <div className="muteText">Assigned on 01/01/2021 by John Doe </div>
                 </div>
-              </form>
+              </div>
             </div>
             <div className="testCaseCommentSection col-md-6  mb-3">
               <h3>Test Cases</h3>

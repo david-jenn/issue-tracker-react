@@ -65,20 +65,18 @@ function BugList({ auth, showError, showSuccess }) {
     setError('');
     axios(`${process.env.REACT_APP_API_URL}/api/bug/list`, {
       method: 'get',
-      params: { pageSize: 1000 },
+      params: { pageSize: 1000, closed: 'true' },
       headers: {
-        authorization: `Bearer ${auth?.token}`
+        authorization: `Bearer ${auth?.token}`,
       },
-      
-      
     })
       .then((res) => {
         console.log(res.data);
         setPending(false);
         if (_.isArray(res.data)) {
-        setBugs(res.data);
+          setBugs(res.data);
         } else {
-          setError('Expected an array')
+          setError('Expected an array');
         }
       })
       .catch((err) => {
@@ -165,11 +163,18 @@ function BugList({ auth, showError, showSuccess }) {
           </div>
         </div>
         <div className="bugSummariesSection col col-md-9 p-3">
-          <div>
-            {_.map(bugs, (bug) => (
-              <BugSummary key={bug._id} bug={bug} />
-            ))}
-          </div>
+          {pending && (
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+          )}
+          {!pending && (
+            <div>
+              {_.map(bugs, (bug) => (
+                <BugSummary key={bug._id} bug={bug} />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

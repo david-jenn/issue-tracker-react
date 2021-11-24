@@ -67,6 +67,7 @@ function Login({ onLogin, showError }) {
           if (typeof resError === 'string') {
             setError(resError);
             showError(resError)
+            console.log(resError)
           } else if (resError.details) {
             setError(_.map(resError.details, (x) => <div>{x.message}</div>));
             showError(resError)
@@ -75,6 +76,7 @@ function Login({ onLogin, showError }) {
           }
         } else {
           setError(err.message);
+          
         }
       });
   }
