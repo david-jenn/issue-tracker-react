@@ -44,8 +44,8 @@ function BugEditor({ auth, showError, showSuccess }) {
   const canClassifyBug = auth?.payload?.permissions?.classifyBug;
 
   const defaultSelectItem = <option value={null}>No User Assigned</option>;
-  const userAssignOptions = _.map(users, (x) => (
-    <option value={x._id}>
+  const userAssignOptions = _.map(users, (x, index) => (
+    <option key={index} value={x._id}>
       {x.fullName} {!x.role ? '' : _.isArray(x.role) ? '( ' + _.join(x.role, ', ') + ' )' : '( ' + x.role + ' )'}
     </option>
   ));
