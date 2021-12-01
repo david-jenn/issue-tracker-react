@@ -82,25 +82,25 @@ function BugEditor({ auth, showError, showSuccess }) {
     //     showError(err.message);
     //   });
 
-    axios(`${process.env.REACT_APP_API_URL}/api/user/list`, {
-      method: 'get',
-      params: { pageSize: 1000 },
-      headers: {
-        authorization: `Bearer ${auth?.token}`,
-      },
-    })
-      .then((res) => {
-        if (_.isArray(res.data)) {
-          setUsers(res.data);
-        } else {
-          setError('Expected an array');
-        }
-      })
-      .catch((err) => {
-        console.log(err);
+    // axios(`${process.env.REACT_APP_API_URL}/api/user/list`, {
+    //   method: 'get',
+    //   params: { pageSize: 1000 },
+    //   headers: {
+    //     authorization: `Bearer ${auth?.token}`,
+    //   },
+    // })
+    //   .then((res) => {
+    //     if (_.isArray(res.data)) {
+    //       setUsers(res.data);
+    //     } else {
+    //       setError('Expected an array');
+    //     }
+    //   })
+    //   .catch((err) => {
+    //     console.log(err);
 
-        setError(err.message);
-      });
+    //     setError(err.message);
+    //   });
   }, [auth, bugId, showError]);
 
   function onInputChange(evt, setValue) {
