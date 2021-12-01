@@ -46,12 +46,12 @@ function BugEditor({ auth, showError, showSuccess }) {
  
 
   useEffect(() => {
-    if(!auth) {
-      return;
-    }
+    // if(!auth) {
+    //   return;
+    // }
 
-    setPageLoadPending(true);
-    setLoaded(false);
+    // setPageLoadPending(true);
+    // setLoaded(false);
 
     // axios(`${process.env.REACT_APP_API_URL}/api/bug/${bugId}`, {
     //   method: 'get',
