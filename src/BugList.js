@@ -3,69 +3,33 @@ import _ from 'lodash';
 import BugSummary from './BugSummary';
 import { nanoid } from 'nanoid';
 import axios from 'axios';
-//import './BugList.css'
+import './BugList.css'
 
 function BugList({ auth, showError, showSuccess }) {
-  // const [bugs, setBugs] = useState([
-  //   {
-  //     _id: nanoid(),
-  //     title: 'Alpha Bug',
-  //     author: 'David Jenn',
-  //     dateFormatted: '01/22/2021',
-  //     status: 'open',
-  //     classification: 'unclassified',
-  //     userAssigned: 'John Doe'
-  //   },
-  //   {
-  //     _id: nanoid(),
-  //     title: 'Beta Bug',
-  //     author: 'John Doe',
-  //     dateFormatted: '01/22/2021',
-  //     status: 'open',
-  //     classification: 'approved',
-  //     userAssigned: 'John Doe'
-  //   },
-  //   {
-  //     _id: nanoid(),
-  //     title: 'Delta Bug',
-  //     author: 'David Jenn',
-  //     dateFormatted: '01/22/2021',
-  //     status: 'closed',
-  //     classification: 'duplicate',
-  //     userAssigned: 'John Doe'
-  //   },
-  //   {
-  //     _id: nanoid(),
-  //     title: 'Echo Bug',
-  //     author: 'Steve Price',
-  //     dateFormatted: '01/22/2021',
-  //     status: 'open',
-  //     classification: 'unapproved',
-  //     userAssigned: 'John Doe'
-  //   },
-  //   {
-  //     _id: nanoid(),
-  //     title: 'Foxtrot Bug',
-  //     author: 'John Doe',
-  //     dateFormatted: '01/22/2021',
-  //     status: 'open',
-  //     classification: 'unclassified',
-  //     userAssigned: 'John Doe'
-  //   },
-
-  // ]);
-
   const [pending, setPending] = useState(false);
   const [bugs, setBugs] = useState(null);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [classification, setClassification] = useState('');
+  const [minAge, setMinAge] = useState('');
+  const [maxAge, setMaxAge] = useState('');
+  const [open, setOpen] = useState('true');
+  const [closed, setClosed] = useState('');
+  const [sortBy, setSortBy] = useState('');
+
+  function onInputChange(evt, setValue, type) {
+    const newValue = evt.currentTarget.value;
+    setValue(newValue);
+
+    console.log(newValue);
+  }
 
   useEffect(() => {
     setPending(true);
     setError('');
     axios(`${process.env.REACT_APP_API_URL}/api/bug/list`, {
       method: 'get',
-      params: { pageSize: 1000, closed: 'true' },
+      params: { pageSize: 1000, classification, minAge, maxAge, closed, open, sortBy },
       headers: {
         authorization: `Bearer ${auth?.token}`,
       },
@@ -75,6 +39,7 @@ function BugList({ auth, showError, showSuccess }) {
         setPending(false);
         if (_.isArray(res.data)) {
           setBugs(res.data);
+          setError('');
         } else {
           setError('Expected an array');
         }
@@ -84,7 +49,7 @@ function BugList({ auth, showError, showSuccess }) {
         setPending(false);
         setError(err.message);
       });
-  }, [auth]);
+  }, [auth, classification, minAge, maxAge, closed, open, sortBy]);
 
   return (
     <div className="p-3 text-light">
@@ -105,8 +70,13 @@ function BugList({ auth, showError, showSuccess }) {
             <label htmlFor="classificationFilter" className="form-label">
               Classification
             </label>
-            <select id="classificationFilter" name="classificationFilter" className="form-select border border-dark">
-              <option value="all">All</option>
+            <select
+              id="classificationFilter"
+              name="classificationFilter"
+              className="form-select border border-dark"
+              onChange={(evt) => onInputChange(evt, setClassification)}
+            >
+              <option value="">All</option>
               <option value="unclassified">Unclassified</option>
               <option value="approved">Approved</option>
               <option value="unapproved">Unapproved</option>
@@ -117,13 +87,18 @@ function BugList({ auth, showError, showSuccess }) {
             <label htmlFor="minAge" className="form-label">
               Min Age
             </label>
-            <select id="minAgeFilter" name="minAgeFilter" className="form-select border border-dark">
-              <option value="all">All</option>
-              <option value="oneHour">1-hour</option>
-              <option value="fourHours">4-hours</option>
-              <option value="twelveHours">12-hours</option>
-              <option value="oneDay">1-day</option>
-              <option value="oneWeek">1-week</option>
+            <select
+              id="minAgeFilter"
+              name="minAgeFilter"
+              className="form-select border border-dark"
+              onChange={(evt) => onInputChange(evt, setMinAge)}
+            >
+              <option value="">All</option>
+              <option value="1">1-day</option>
+              <option value="7">7-days</option>
+              <option value="30">30-days</option>
+              <option value="60">60-days</option>
+              <option value="90">90-days</option>
             </select>
           </div>
           <div className="filterItem">

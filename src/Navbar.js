@@ -10,8 +10,8 @@ function NavBar({ auth, onLogout }) {
   }
 
   return (
-    <header className="mb-3">
-      <nav className="bg-light navbar navbar-light position-sticky top-0 navbar-expand-sm p-3">
+    <header className="mb-3 position-sticky top-0">
+      <nav className="bg-light navbar navbar-light  navbar-expand-sm p-3">
         <div className="container-fluid">
           <NavLink className="navbar-brand" to="/">
             Issue Tracker

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useEffect } from 'react/cjs/react.development';
 import { moment } from 'moment';
-import _ from 'lodash';
+import _, { set } from 'lodash';
 
 import './BugEditor.css';
 import InputField from './InputField';
@@ -11,18 +11,22 @@ import TextAreaField from './TextAreaField';
 
 function BugEditor({ auth, showError, showSuccess }) {
   const { bugId } = useParams();
-  const [ users, setUsers ] = useState([]);
+  const [users, setUsers] = useState([]);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [stepsToReproduce, setStepsToReproduce] = useState('');
   const [classification, setClassification] = useState('');
-  const [assignedTo, setAssignedTo] = useState('');
+  const [assignedToId, setAssignedToId] = useState('');
+  const [assignedToFullName, setAssignedToFullName] = useState('');
   const [closed, setClosed] = useState(null);
+  const [bug, setBug] = useState(null);
+  const [assignedTo, setAssignedTo] = useState(null);
 
   const [pageLoadPending, setPageLoadPending] = useState(false);
   const [editPending, setEditPending] = useState(false);
   const [classificationPending, setClassificationPending] = useState(false);
   const [statusPending, setStatusPending] = useState(false);
+  const [assignmentPending, setAssignmentPending] = useState(false);
 
   const [editSuccess, setEditSuccess] = useState('');
   const [editError, setEditError] = useState('');
@@ -30,14 +34,22 @@ function BugEditor({ auth, showError, showSuccess }) {
   const [classificationError, setClassificationError] = useState('');
   const [statusSuccess, setStatusSuccess] = useState('');
   const [statusError, setStatusError] = useState('');
+  const [assignmentSuccess, setAssignmentSuccess] = useState('');
+  const [assignmentError, setAssignmentError] = useState('');
 
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState('');
-  const [bug, setBug] = useState(null);
 
   const canCloseBug = auth?.payload?.permissions?.closeBug;
   const canClassifyBug = auth?.payload?.permissions?.classifyBug;
 
+  const defaultSelectItem = <option value={null}>No User Assigned</option>;
+  const userAssignOptions = _.map(users, (x) => (
+    <option value={x._id}>
+      {x.fullName} {!x.role ? '' : _.isArray(x.role) ? '( ' + _.join(x.role, ', ') + ' )' : '( ' + x.role + ' )'}
+    </option>
+  ));
+  userAssignOptions.unshift(defaultSelectItem);
 
   useEffect(() => {
     setPageLoadPending(true);
@@ -54,12 +66,15 @@ function BugEditor({ auth, showError, showSuccess }) {
         setLoaded(true);
         console.log(res.data);
         setBug(res.data);
+        setAssignedTo(res.data?.assignedTo);
+        console.log('assigned to:', assignedTo);
         setTitle(res.data.title);
         setDescription(res.data.description);
         setStepsToReproduce(res.data.stepsToReproduce);
         setClassification(res.data.classification);
-        setAssignedTo(res.data.userAssigned?.fullName);
-        
+        setAssignedToId(res.data.assignedTo?._id);
+        setAssignedToFullName(res.data.assignedTo?.fullName);
+
         setClosed(res.data.closed === true ? 'true' : res.data.closed === false ? 'false' : null);
         console.log(title);
       })
@@ -70,38 +85,32 @@ function BugEditor({ auth, showError, showSuccess }) {
         showError(err.message);
       });
 
-
-      axios(`${process.env.REACT_APP_API_URL}/api/user/list`, {
-        method: 'get',
-        params: { pageSize: 1000 },
-        headers: {
-          authorization: `Bearer ${auth?.token}`
-        },
-        
-        
-      })
-        .then((res) => {
-          console.log(res.data);
-          
-          if (_.isArray(res.data)) {
+    axios(`${process.env.REACT_APP_API_URL}/api/user/list`, {
+      method: 'get',
+      params: { pageSize: 1000 },
+      headers: {
+        authorization: `Bearer ${auth?.token}`,
+      },
+    })
+      .then((res) => {
+        if (_.isArray(res.data)) {
           setUsers(res.data);
-          } else {
-            setError('Expected an array')
-          }
-          console.log(_.map(users, (x) => x.fullName))
-        })
-        .catch((err) => {
-          console.log(err);
-         
-          setError(err.message);
-        });
+        } else {
+          setError('Expected an array');
+        }
+        console.log(_.map(users, (x) => x.fullName));
+      })
+      .catch((err) => {
+        console.log(err);
+
+        setError(err.message);
+      });
   }, [auth, bugId, showError]);
 
   function onInputChange(evt, setValue) {
     const newValue = evt.currentTarget.value;
     setValue(newValue);
     console.log(newValue);
-    
   }
 
   function onSendCloseReq(evt) {
@@ -112,6 +121,7 @@ function BugEditor({ auth, showError, showSuccess }) {
     setClassificationSuccess('');
     setStatusError('');
     setStatusSuccess('');
+    setAssignmentSuccess('');
 
     setStatusPending(true);
 
@@ -135,19 +145,69 @@ function BugEditor({ auth, showError, showSuccess }) {
         if (resError) {
           if (typeof resError === 'string') {
             setError(resError);
-            showError(resError)
-            console.log(resError)
+            showError(resError);
+            console.log(resError);
           } else if (resError.details) {
             setError(_.map(resError.details, (x) => <div>{x.message}</div>));
-            showError(resError)
+            showError(resError);
           } else {
             setError(JSON.stringify(resError));
           }
         } else {
           setError(err.message);
-          
         }
-        
+      });
+  }
+
+  function onSendAssignmentReq(evt) {
+    evt.preventDefault();
+    setEditError('');
+    setEditSuccess('');
+    setClassificationError('');
+    setClassificationSuccess('');
+    setStatusError('');
+    setStatusSuccess('');
+    setStatusSuccess('');
+    setAssignmentSuccess('');
+    setAssignmentError('');
+
+    setAssignmentPending(true);
+
+    axios(`${process.env.REACT_APP_API_URL}/api/bug/${bugId}/assign`, {
+      method: 'put',
+      data: { userAssigned: assignedToId },
+      headers: {
+        authorization: `Bearer ${auth?.token}`,
+      },
+    })
+      .then((res) => {
+        console.log(res);
+
+        setAssignmentPending(false);
+        setAssignedTo(_.find(users, (x) => x._id === assignedToId));
+        setAssignmentSuccess(res.data.message);
+        showSuccess(res.data.message);
+      })
+      .catch((err) => {
+        console.log(err);
+        setAssignmentPending(false);
+        const resError = err?.response?.data?.error;
+
+        if (resError) {
+          if (typeof resError === 'string') {
+            setAssignmentError(resError);
+            showError(resError);
+            console.log(resError);
+          } else if (resError.details) {
+            setAssignmentError(_.map(resError.details, (x) => <div>{x.message}</div>));
+            showError(resError);
+          } else {
+            setError(JSON.stringify(resError));
+          }
+        } else {
+          setError(err.message);
+          showError(err.message);
+        }
       });
   }
 
@@ -159,6 +219,8 @@ function BugEditor({ auth, showError, showSuccess }) {
     setClassificationSuccess('');
     setStatusError('');
     setStatusSuccess('');
+    setStatusSuccess('');
+    setAssignmentSuccess('');
 
     setClassificationPending(true);
 
@@ -209,6 +271,8 @@ function BugEditor({ auth, showError, showSuccess }) {
     setClassificationSuccess('');
     setStatusError('');
     setStatusSuccess('');
+    setStatusSuccess('');
+    setAssignmentSuccess('');
 
     axios(`${process.env.REACT_APP_API_URL}/api/bug/${bugId}`, {
       method: 'put',
@@ -247,17 +311,13 @@ function BugEditor({ auth, showError, showSuccess }) {
       });
   }
 
-  
-
   return (
-    <div className="sectionContainer">
+    <div className="section-container">
       {!auth && <h1 className="text-danger">You do not have permission</h1>}
 
       {auth && (
         <div>
           <h1>{bug?.title}</h1>
-
-          <div className="muteText"> </div>
 
           <div className="muteText mb-4">
             {bug?.createdBy?.fullName ? `Reported by ${bug?.createdBy?.fullName}` : 'Author not found'}
@@ -431,7 +491,7 @@ function BugEditor({ auth, showError, showSuccess }) {
                     </div>
                     {canCloseBug && (
                       <button
-                        id="bug-close-btn"
+                        id="closeBugBtn"
                         type="submit"
                         className="btn btn-primary mb-3 me-3"
                         disabled={!canCloseBug}
@@ -456,14 +516,41 @@ function BugEditor({ auth, showError, showSuccess }) {
                   <h3>Assigned User</h3>
 
                   <div className="employeeSearchContainer">
-                    <label htmlFor="employeeAssign" className="form-label">
-                      Select User
-                    </label>
-                    <select id="employeeAssign" name="employeeAssign" className="form-select border border-dark mb-3" children={_.map(users, (x) => <option>{x.fullName}</option>)}>
-                     
-                    </select>
+                    <form>
+                      <label htmlFor="employeeAssign" className="form-label">
+                        Select User
+                      </label>
+
+                      <select
+                        id="employeeAssign"
+                        name="employeeAssign"
+                        className="form-select border border-dark mb-3"
+                        onChange={(evt) => onInputChange(evt, setAssignedToId)}
+                        value={assignedToId ? assignedToId : null}
+                        children={userAssignOptions}
+                      ></select>
+                      {canCloseBug && (
+                        <button
+                          id="assignmentBugBtn"
+                          type="submit"
+                          className="btn btn-primary mb-3 me-3"
+                          disabled={!canCloseBug}
+                          onClick={(evt) => onSendAssignmentReq(evt)}
+                        >
+                          Confirm Status
+                        </button>
+                      )}
+                      {assignmentSuccess && <div className="text-success">{assignmentSuccess}</div>}
+                      {assignmentError && <div className="text-danger">{assignmentError}</div>}
+
+                      {assignmentPending && (
+                        <div className="spinner-border text-primary" role="status">
+                          <span className="visually-hidden">Loading...</span>
+                        </div>
+                      )}
+                    </form>
                   </div>
-                  <div>Assigned to John Doe </div>
+                  <div>Assigned to {assignedTo?.fullName}</div>
 
                   <div className="muteText">Assigned on 01/01/2021 by John Doe </div>
                 </div>
@@ -485,13 +572,13 @@ function BugEditor({ auth, showError, showSuccess }) {
               </div>
 
               <div className="form-section">
-                <button id="display-comments-btn" type="button" className="btn btn-secondary mb-3">
+                <button id="displayCommentsButton" type="button" className="btn btn-secondary mb-3">
                   Display Comments
                 </button>
               </div>
 
-              <form id="comment-section-form" action="/issues" method="post">
-                <div className="form-section leave-comment-section">
+              <form id="commentSectionForm" action="/issues" method="post">
+                <div className="formSection leaveCommentSection">
                   <h3>Leave A Comment</h3>
                   <div className="mb-3">
                     <label htmlFor="comment-author" className="form-label">
