@@ -1,7 +1,7 @@
 import axios from 'axios';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { useEffect } from 'react/cjs/react.development';
+
 import { moment } from 'moment';
 import _ from 'lodash';
 
