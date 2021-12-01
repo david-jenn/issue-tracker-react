@@ -46,62 +46,62 @@ function BugEditor({ auth, showError, showSuccess }) {
  
 
   useEffect(() => {
-  //   if(!auth) {
-  //     return;
-  //   }
+    if(!auth) {
+      return;
+    }
 
-  //   setPageLoadPending(true);
-  //   setLoaded(false);
+    setPageLoadPending(true);
+    setLoaded(false);
 
-  //   axios(`${process.env.REACT_APP_API_URL}/api/bug/${bugId}`, {
-  //     method: 'get',
-  //     headers: {
-  //       authorization: `Bearer ${auth?.token}`,
-  //     },
-  //   })
-  //     .then((res) => {
-  //       setPageLoadPending(false);
-  //       setLoaded(true);
-  //       console.log(res.data);
-  //       setBug(res.data);
-  //       setAssignedTo(res.data?.assignedTo);
+    axios(`${process.env.REACT_APP_API_URL}/api/bug/${bugId}`, {
+      method: 'get',
+      headers: {
+        authorization: `Bearer ${auth?.token}`,
+      },
+    })
+      .then((res) => {
+        setPageLoadPending(false);
+        setLoaded(true);
+        console.log(res.data);
+        setBug(res.data);
+        setAssignedTo(res.data?.assignedTo);
 
-  //       setTitle(res.data.title);
-  //       setDescription(res.data.description);
-  //       setStepsToReproduce(res.data.stepsToReproduce);
-  //       setClassification(res.data.classification);
-  //       setAssignedToId(res.data.assignedTo?._id);
-  //       setAssignedToFullName(res.data.assignedTo?.fullName);
+        setTitle(res.data.title);
+        setDescription(res.data.description);
+        setStepsToReproduce(res.data.stepsToReproduce);
+        setClassification(res.data.classification);
+        setAssignedToId(res.data.assignedTo?._id);
+        setAssignedToFullName(res.data.assignedTo?.fullName);
 
-  //       setClosed(res.data.closed === true ? 'true' : res.data.closed === false ? 'false' : null);
-  //     })
-  //     .catch((err) => {
-  //       console.error(err);
-  //       setPageLoadPending(false);
-  //       setError(err.message);
-  //       showError(err.message);
-  //     });
+        setClosed(res.data.closed === true ? 'true' : res.data.closed === false ? 'false' : null);
+      })
+      .catch((err) => {
+        console.error(err);
+        setPageLoadPending(false);
+        setError(err.message);
+        showError(err.message);
+      });
 
-  //   axios(`${process.env.REACT_APP_API_URL}/api/user/list`, {
-  //     method: 'get',
-  //     params: { pageSize: 1000 },
-  //     headers: {
-  //       authorization: `Bearer ${auth?.token}`,
-  //     },
-  //   })
-  //     .then((res) => {
-  //       if (_.isArray(res.data)) {
-  //         setUsers(res.data);
-  //       } else {
-  //         setError('Expected an array');
-  //       }
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
+    axios(`${process.env.REACT_APP_API_URL}/api/user/list`, {
+      method: 'get',
+      params: { pageSize: 1000 },
+      headers: {
+        authorization: `Bearer ${auth?.token}`,
+      },
+    })
+      .then((res) => {
+        if (_.isArray(res.data)) {
+          setUsers(res.data);
+        } else {
+          setError('Expected an array');
+        }
+      })
+      .catch((err) => {
+        console.log(err);
 
-  //       setError(err.message);
-  //     });
-  }, []);
+        setError(err.message);
+      });
+  }, [auth, bugId, showError]);
 
   function onInputChange(evt, setValue) {
     const newValue = evt.currentTarget.value;

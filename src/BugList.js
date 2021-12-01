@@ -27,6 +27,9 @@ function BugList({ auth, showError, showSuccess }) {
   useEffect(() => {
     setPending(true);
     setError('');
+    if (!auth) {
+      return;
+    }
     axios(`${process.env.REACT_APP_API_URL}/api/bug/list`, {
       method: 'get',
       params: { pageSize: 1000, classification, minAge, maxAge, closed, open, sortBy },
