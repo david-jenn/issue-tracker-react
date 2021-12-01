@@ -43,71 +43,65 @@ function BugEditor({ auth, showError, showSuccess }) {
   const canCloseBug = auth?.payload?.permissions?.closeBug;
   const canClassifyBug = auth?.payload?.permissions?.classifyBug;
 
-  // const defaultSelectItem = <option value={null}>No User Assigned</option>;
-  // const userAssignOptions = _.map(users, (x, index) => (
-  //   <option key={index} value={x._id}>
-  //     {x.fullName} {!x.role ? '' : _.isArray(x.role) ? '( ' + _.join(x.role, ', ') + ' )' : '( ' + x.role + ' )'}
-  //   </option>
-  // ));
-  // userAssignOptions.unshift(defaultSelectItem);
+ 
 
-  useEffect(() => {
-    if(!auth) {
-      return;
-    }
+  // useEffect(() => {
+  //   if(!auth) {
+  //     return;
+  //   }
 
-    setPageLoadPending(true);
-    setLoaded(false);
+  //   setPageLoadPending(true);
+  //   setLoaded(false);
 
-    axios(`${process.env.REACT_APP_API_URL}/api/bug/${bugId}`, {
-      method: 'get',
-      headers: {
-        authorization: `Bearer ${auth?.token}`,
-      },
-    })
-      .then((res) => {
-        setPageLoadPending(false);
-        setLoaded(true);
-        console.log(res.data);
-        setBug(res.data);
-        setAssignedTo(res.data?.assignedTo);
+  //   axios(`${process.env.REACT_APP_API_URL}/api/bug/${bugId}`, {
+  //     method: 'get',
+  //     headers: {
+  //       authorization: `Bearer ${auth?.token}`,
+  //     },
+  //   })
+  //     .then((res) => {
+  //       setPageLoadPending(false);
+  //       setLoaded(true);
+  //       console.log(res.data);
+  //       setBug(res.data);
+  //       setAssignedTo(res.data?.assignedTo);
 
-        setTitle(res.data.title);
-        setDescription(res.data.description);
-        setStepsToReproduce(res.data.stepsToReproduce);
-        setClassification(res.data.classification);
-        setAssignedToId(res.data.assignedTo?._id);
-        setAssignedToFullName(res.data.assignedTo?.fullName);
+  //       setTitle(res.data.title);
+  //       setDescription(res.data.description);
+  //       setStepsToReproduce(res.data.stepsToReproduce);
+  //       setClassification(res.data.classification);
+  //       setAssignedToId(res.data.assignedTo?._id);
+  //       setAssignedToFullName(res.data.assignedTo?.fullName);
 
-        setClosed(res.data.closed === true ? 'true' : res.data.closed === false ? 'false' : null);
-      })
-      .catch((err) => {
-        console.error(err);
-        setPageLoadPending(false);
-        setError(err.message);
-        showError(err.message);
-      });
+  //       setClosed(res.data.closed === true ? 'true' : res.data.closed === false ? 'false' : null);
+  //     })
+  //     .catch((err) => {
+  //       console.error(err);
+  //       setPageLoadPending(false);
+  //       setError(err.message);
+  //       showError(err.message);
+  //     });
 
-    axios(`${process.env.REACT_APP_API_URL}/api/user/list`, {
-      method: 'get',
-      params: { pageSize: 1000 },
-      headers: {
-        authorization: `Bearer ${auth?.token}`,
-      },
-    })
-      .then((res) => {
-        if (_.isArray(res.data)) {
-          setUsers(res.data);
-        } else {
-          setError('Expected an array');
-        }
-      })
-      .catch((err) => {
-        console.log(err);
+  //   axios(`${process.env.REACT_APP_API_URL}/api/user/list`, {
+  //     method: 'get',
+  //     params: { pageSize: 1000 },
+  //     headers: {
+  //       authorization: `Bearer ${auth?.token}`,
+  //     },
+  //   })
+  //     .then((res) => {
+  //       if (_.isArray(res.data)) {
+  //         setUsers(res.data);
+  //       } else {
+  //         setError('Expected an array');
+  //       }
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
 
-        setError(err.message);
-      });
-  }, [auth, bugId, showError]);
+  //       setError(err.message);
+  //     });
+  // }, [auth, bugId, showError]);
 
   function onInputChange(evt, setValue) {
     const newValue = evt.currentTarget.value;
