@@ -15,7 +15,7 @@ function Login({ onLogin, showError }) {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [pending, setPending] = useState(false);
-  
+
   const shouldValidate = false;
 
   const emailError = !email ? 'Email is required' : !email.includes('@') ? 'Email must include @ sign' : '';
@@ -34,7 +34,6 @@ function Login({ onLogin, showError }) {
     setPending(true);
 
     console.log(process.env.REACT_APP_API_URL);
-   
 
     if (emailError || passwordError) {
       setError('Please fix errors above');
@@ -45,9 +44,7 @@ function Login({ onLogin, showError }) {
 
     axios(`${process.env.REACT_APP_API_URL}/api/user/login`, { method: 'post', data: { email, password } })
       .then((res) => {
-        console.log(res);
         setPending(false);
-        console.log(res.data)
         setSuccess(res.data.message);
         const authPayload = jwt.decode(res.data.token);
         const auth = {
@@ -56,7 +53,6 @@ function Login({ onLogin, showError }) {
           token: res.data.token,
           payload: authPayload,
         };
-        console.log(auth);
         onLogin(auth);
       })
       .catch((err) => {
@@ -66,17 +62,16 @@ function Login({ onLogin, showError }) {
         if (resError) {
           if (typeof resError === 'string') {
             setError(resError);
-            showError(resError)
-            console.log(resError)
+            showError(resError);
+            console.log(resError);
           } else if (resError.details) {
             setError(_.map(resError.details, (x) => <div>{x.message}</div>));
-            showError(resError)
+            showError(resError);
           } else {
             setError(JSON.stringify(resError));
           }
         } else {
           setError(err.message);
-          
         }
       });
   }
@@ -89,7 +84,6 @@ function Login({ onLogin, showError }) {
 
   return (
     <div>
-      
       <h1>Login</h1>
       <form>
         <InputField

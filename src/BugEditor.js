@@ -11,6 +11,7 @@ import TextAreaField from './TextAreaField';
 
 function BugEditor({ auth, showError, showSuccess }) {
   const { bugId } = useParams();
+  const [bug, setBug] = useState(null);
   const [users, setUsers] = useState([]);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -19,7 +20,6 @@ function BugEditor({ auth, showError, showSuccess }) {
   const [assignedToId, setAssignedToId] = useState('');
   const [assignedToFullName, setAssignedToFullName] = useState('');
   const [closed, setClosed] = useState(null);
-  const [bug, setBug] = useState(null);
   const [assignedTo, setAssignedTo] = useState(null);
 
   const [pageLoadPending, setPageLoadPending] = useState(false);
@@ -43,15 +43,19 @@ function BugEditor({ auth, showError, showSuccess }) {
   const canCloseBug = auth?.payload?.permissions?.closeBug;
   const canClassifyBug = auth?.payload?.permissions?.classifyBug;
 
-  const defaultSelectItem = <option value={null}>No User Assigned</option>;
-  const userAssignOptions = _.map(users, (x, index) => (
-    <option key={index} value={x._id}>
-      {x.fullName} {!x.role ? '' : _.isArray(x.role) ? '( ' + _.join(x.role, ', ') + ' )' : '( ' + x.role + ' )'}
-    </option>
-  ));
-  userAssignOptions.unshift(defaultSelectItem);
+  // const defaultSelectItem = <option value={null}>No User Assigned</option>;
+  // const userAssignOptions = _.map(users, (x, index) => (
+  //   <option key={index} value={x._id}>
+  //     {x.fullName} {!x.role ? '' : _.isArray(x.role) ? '( ' + _.join(x.role, ', ') + ' )' : '( ' + x.role + ' )'}
+  //   </option>
+  // ));
+  // userAssignOptions.unshift(defaultSelectItem);
 
   useEffect(() => {
+    if(!auth) {
+      return;
+    }
+
     setPageLoadPending(true);
     setLoaded(false);
 
@@ -67,7 +71,7 @@ function BugEditor({ auth, showError, showSuccess }) {
         console.log(res.data);
         setBug(res.data);
         setAssignedTo(res.data?.assignedTo);
-        
+
         setTitle(res.data.title);
         setDescription(res.data.description);
         setStepsToReproduce(res.data.stepsToReproduce);
@@ -76,7 +80,6 @@ function BugEditor({ auth, showError, showSuccess }) {
         setAssignedToFullName(res.data.assignedTo?.fullName);
 
         setClosed(res.data.closed === true ? 'true' : res.data.closed === false ? 'false' : null);
-        
       })
       .catch((err) => {
         console.error(err);
@@ -98,7 +101,6 @@ function BugEditor({ auth, showError, showSuccess }) {
         } else {
           setError('Expected an array');
         }
-        
       })
       .catch((err) => {
         console.log(err);
@@ -309,6 +311,16 @@ function BugEditor({ auth, showError, showSuccess }) {
           showError('error');
         }
       });
+  }
+
+  function formatRoles(role) {
+    if (!role) {
+      return '';
+    } else if (_.isArray(role)) {
+      return '( ' + _.join(role, ', ') + ' )';
+    } else {
+      return '( ' + role + ' )';
+    }
   }
 
   return (
@@ -527,8 +539,16 @@ function BugEditor({ auth, showError, showSuccess }) {
                         className="form-select border border-dark mb-3"
                         onChange={(evt) => onInputChange(evt, setAssignedToId)}
                         value={assignedToId ? assignedToId : ''}
-                        children={userAssignOptions}
-                      ></select>
+                      >
+                        <option key="" value={null}>
+                          No User Assigned
+                        </option>
+                        {_.map(users, (x, index) => (
+                          <option key={x._id} value={x._id}>
+                            {x.fullName}{' '}{formatRoles(x.role)}
+                          </option>
+                        ))}
+                      </select>
                       {canCloseBug && (
                         <button
                           id="assignmentBugBtn"

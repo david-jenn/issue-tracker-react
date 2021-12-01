@@ -35,7 +35,6 @@ function BugList({ auth, showError, showSuccess }) {
       },
     })
       .then((res) => {
-        console.log(res.data);
         setPending(false);
         if (_.isArray(res.data)) {
           setBugs(res.data);
