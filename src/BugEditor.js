@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useEffect } from 'react/cjs/react.development';
 import { moment } from 'moment';
-import _, { set } from 'lodash';
+import _ from 'lodash';
 
 import './BugEditor.css';
 import InputField from './InputField';
