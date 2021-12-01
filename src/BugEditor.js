@@ -67,7 +67,7 @@ function BugEditor({ auth, showError, showSuccess }) {
         console.log(res.data);
         setBug(res.data);
         setAssignedTo(res.data?.assignedTo);
-        console.log('assigned to:', assignedTo);
+        
         setTitle(res.data.title);
         setDescription(res.data.description);
         setStepsToReproduce(res.data.stepsToReproduce);
@@ -76,7 +76,7 @@ function BugEditor({ auth, showError, showSuccess }) {
         setAssignedToFullName(res.data.assignedTo?.fullName);
 
         setClosed(res.data.closed === true ? 'true' : res.data.closed === false ? 'false' : null);
-        console.log(title);
+        
       })
       .catch((err) => {
         console.error(err);
@@ -98,7 +98,7 @@ function BugEditor({ auth, showError, showSuccess }) {
         } else {
           setError('Expected an array');
         }
-        console.log(_.map(users, (x) => x.fullName));
+        
       })
       .catch((err) => {
         console.log(err);
@@ -148,7 +148,7 @@ function BugEditor({ auth, showError, showSuccess }) {
             showError(resError);
             console.log(resError);
           } else if (resError.details) {
-            setError(_.map(resError.details, (x) => <div>{x.message}</div>));
+            setError(_.map(resError.details, (x, index) => <div key={index}>{x.message}</div>));
             showError(resError);
           } else {
             setError(JSON.stringify(resError));
@@ -199,7 +199,7 @@ function BugEditor({ auth, showError, showSuccess }) {
             showError(resError);
             console.log(resError);
           } else if (resError.details) {
-            setAssignmentError(_.map(resError.details, (x) => <div>{x.message}</div>));
+            setAssignmentError(_.map(resError.details, (x, index) => <div key={index}>{x.message}</div>));
             showError(resError);
           } else {
             setError(JSON.stringify(resError));
@@ -250,7 +250,7 @@ function BugEditor({ auth, showError, showSuccess }) {
             showError(resError);
             console.log(resError);
           } else if (resError.details) {
-            setClassificationError(_.map(resError.details, (x) => <div>{x.message}</div>));
+            setClassificationError(_.map(resError.details, (x, index) => <div key={index}>{x.message}</div>));
             showError(resError);
           } else {
             setError(JSON.stringify(resError));
@@ -295,7 +295,7 @@ function BugEditor({ auth, showError, showSuccess }) {
             setEditError(resError);
             showError(resError);
           } else if (resError.details) {
-            setEditError(_.map(resError.details, (x) => <div>{x.message}</div>));
+            setEditError(_.map(resError.details, (x, index) => <div key={index}>{x.message}</div>));
             showError(_.map(resError.details, (x) => x.message));
             for (const detail of resError.details) {
               showError(detail.message);
@@ -526,7 +526,7 @@ function BugEditor({ auth, showError, showSuccess }) {
                         name="employeeAssign"
                         className="form-select border border-dark mb-3"
                         onChange={(evt) => onInputChange(evt, setAssignedToId)}
-                        value={assignedToId ? assignedToId : null}
+                        value={assignedToId ? assignedToId : ''}
                         children={userAssignOptions}
                       ></select>
                       {canCloseBug && (
