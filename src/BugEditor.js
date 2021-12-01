@@ -43,10 +43,8 @@ function BugEditor({ auth, showError, showSuccess }) {
   const canCloseBug = auth?.payload?.permissions?.closeBug;
   const canClassifyBug = auth?.payload?.permissions?.classifyBug;
 
- 
-
   useEffect(() => {
-    if(!auth) {
+    if (!auth) {
       return;
     }
 
@@ -62,7 +60,7 @@ function BugEditor({ auth, showError, showSuccess }) {
       .then((res) => {
         setPageLoadPending(false);
         setLoaded(true);
-        console.log(res.data);
+
         setBug(res.data);
         setAssignedTo(res.data?.assignedTo);
 
@@ -76,7 +74,6 @@ function BugEditor({ auth, showError, showSuccess }) {
         setClosed(res.data.closed === true ? 'true' : res.data.closed === false ? 'false' : null);
       })
       .catch((err) => {
-        console.error(err);
         setPageLoadPending(false);
         setError(err.message);
         showError(err.message);
@@ -101,7 +98,7 @@ function BugEditor({ auth, showError, showSuccess }) {
 
         setError(err.message);
       });
-  }, [auth, bugId, showError]);
+  }, [auth, bugId]);
 
   function onInputChange(evt, setValue) {
     const newValue = evt.currentTarget.value;
@@ -539,7 +536,7 @@ function BugEditor({ auth, showError, showSuccess }) {
                         </option>
                         {_.map(users, (x, index) => (
                           <option key={x._id} value={x._id}>
-                            {x.fullName}{' '}{formatRoles(x.role)}
+                            {x.fullName} {formatRoles(x.role)}
                           </option>
                         ))}
                       </select>
