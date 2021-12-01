@@ -98,7 +98,7 @@ function BugEditor({ auth, showError, showSuccess }) {
 
         setError(err.message);
       });
-  }, [auth, bugId]);
+  }, [auth, bugId, showError]);
 
   function onInputChange(evt, setValue) {
     const newValue = evt.currentTarget.value;
