@@ -45,7 +45,7 @@ function BugEditor({ auth, showError, showSuccess }) {
 
  
 
-  // useEffect(() => {
+  useEffect(() => {
   //   if(!auth) {
   //     return;
   //   }
@@ -101,7 +101,7 @@ function BugEditor({ auth, showError, showSuccess }) {
 
   //       setError(err.message);
   //     });
-  // }, [auth, bugId, showError]);
+  }, []);
 
   function onInputChange(evt, setValue) {
     const newValue = evt.currentTarget.value;
