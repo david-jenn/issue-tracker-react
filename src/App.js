@@ -71,13 +71,13 @@ function App() {
           <Route path="/" element={<Navigate to="/login" />} />
           <Route path="/login" element={<Login onLogin={onLogin} showError={showError} />} />
           <Route path="/register" element={<Register showError={showError} onLogin={onLogin} />} />
-          <Route path="/bug/list" element={<BugList auth={auth} />} />
+          <Route path="/bug/list" element={<BugList showError={showError} auth={auth} />} />
           <Route
             path="/bug/:bugId"
             element={<BugEditor auth={auth} showError={showError} showSuccess={showSuccess} />}
           />
-          <Route path="/user/list" element={<UserList />} />
-          <Route path="/user/:userId" element={<UserEditor />} />
+          <Route path="/user/list" element={<UserList  showError={showError} auth={auth} />} />
+          <Route path="/user/:userId" element={<UserEditor auth={auth} showError={showError} showSuccess={showSuccess} />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>

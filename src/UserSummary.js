@@ -1,26 +1,41 @@
+import { Link } from 'react-router-dom';
+import moment from 'moment';
 
+import './UserSummary.css';
+import _ from 'lodash';
+import { __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED } from 'react';
 
-import './UserSummary.css'
-
-function UserSummary({ user, onNavigate, getUser }) {
-
-  function showEditUserPage(evt, user) {
-    getUser(evt, user);
-    onNavigate(evt, `/user/edit/${user._id}`);
+function UserSummary({ user }) {
+  function displayRoleBadges(user) {
+    if (_.isArray(user.role) && user.role[0]) {
+      return (
+        <div>
+          {_.map(user.role, (role, index) => (
+            <span key={index} className="badge bg-primary me-2">{role}</span>
+          ))}
+        </div>
+      );
+    } else if (_.isString(user.role)) {
+      return <span className="badge bg-primary me-2">{user.role}</span>;
+    } else {
+      return <span className="badge bg-danger me-2">No Role</span>;
+    }
   }
 
   return (
-    <div
-      id={`user-${user._id}`}
-      className="UserSummary d-flex mb-1 flex-grow-1 flex-shrink-1 flex-column flex-sm-row border border-dark p-1"
-      onClick={(evt) => showEditUserPage(evt, user)}
-    >
-      <div className="me-3 flex-grow-1 flex-shrink-1">{user.fullName}</div>
-      <div className="me-3 flex-shrink-0">{user.role}</div>
-      <div className="me-3 flex-shrink-1">
-        {user.createdOn}
+    <div className="card border-dark text-dark mb-2">
+      <div className="card-body">
+        <div className="titleContainer d-md-flex justify-content-between">
+          <div className="card-title">
+            <Link to={`/user/${user._id}`}>{user.fullName}</Link>
+          </div>
+          <div>{displayRoleBadges(user)}</div>
+        </div>
+        <div>{user.email}</div>
       </div>
-      <div className="me-3 flex-shrink-1">{user.email}</div>
+      <div className="card-footer">
+        {user.createdDate && <span>User added {moment(user.createdDate).fromNow()}</span>}
+      </div>
     </div>
   );
 }

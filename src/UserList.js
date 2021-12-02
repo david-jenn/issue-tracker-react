@@ -1,39 +1,66 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import _ from 'lodash';
 import UserSummary from './UserSummary';
 import { nanoid } from 'nanoid';
+import axios from 'axios';
 
-function UserList({ onNavigate, getUser }) {
-  const [users, setUsers] = useState([
-    {
-      _id: nanoid(),
-      fullName: 'David Jenn',
-      email: 'djenn@gmail.com',
-      role: 'DEV',
-      createdOn: '12/11/2020',
-    },
-    {
-      _id: nanoid(),
-      fullName: 'John Doe',
-      email: 'jdoe@gmail.com',
-      role: 'QA',
-      createdOn: '12/23/2020',
-    },
-    {
-      _id: nanoid(),
-      fullName: 'John Smith',
-      email: 'jmith@gmail.com',
-      role: 'BA',
-      createdOn: '03/22/2021',
-    },
-    {
-      _id: nanoid(),
-      fullName: 'Steve Price',
-      email: 'sprice@gmail.com',
-      role: 'PM',
-      createdOn: '04/24/2021',
-    },
-  ]);
+function UserList({ auth, showError }) {
+  const [pending, setPending] = useState(false);
+  const [users, setUsers] = useState(null);
+  const [error, setError] = useState('');
+
+  function onInputChange(evt, setValue) {
+    const newValue = evt.currentTarget.value;
+    setValue(newValue);
+
+    console.log(newValue);
+  }
+
+  useEffect(() => {
+    setPending(true);
+    setError('');
+
+    if (!auth) {
+      return;
+    }
+    axios(`${process.env.REACT_APP_API_URL}/api/user/list`, {
+      method: 'get',
+      params: { pageSize: 1000 },
+      headers: {
+        authorization: `Bearer ${auth?.token}`,
+      },
+    })
+      .then((res) => {
+        setPending(false);
+        if (_.isArray(res.data)) {
+          setUsers(res.data);
+        } else {
+          setError('expected an array');
+        }
+      })
+      .catch((err) => {
+        setPending(false);
+        const resError = err?.response?.data?.error;
+        if (resError) {
+          if (typeof resError === 'string') {
+            setError(resError);
+            showError(resError);
+          } else if (resError.details) {
+            setError(_.map(resError.details, (x, index) => <div key={index}>{x.message}</div>));
+            showError(_.map(resError.details, (x) => x.message));
+            for (const detail of resError.details) {
+              showError(detail.message);
+            }
+          } else {
+            setError(JSON.stringify(resError));
+            showError(JSON.stringify(resError));
+          }
+        } else {
+          setError(err.message);
+          showError(err.message);
+        }
+      });
+  }, [auth]);
 
   return (
     <div className="p-3 text-light">
@@ -103,11 +130,20 @@ function UserList({ onNavigate, getUser }) {
           </div>
         </div>
         <div className="userSummariesSection col col-md-9 p-3">
-          <div>
-            {_.map(users, (user) => (
-              <UserSummary key={user._id} user={user} onNavigate={onNavigate} getUser={getUser} />
-            ))}
-          </div>
+          {pending && (
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+          )}
+          {users?.length > 0 && (
+            <div>
+              {_.map(users, (user) => (
+                <UserSummary key={user._id} user={user} />
+              ))}
+            </div>
+          )}
+          {users?.length === 0 && !error && !pending && <div className="fs-3 text-danger">No Users Found</div>}
+          {!pending && error && <div className="fs-3 text-danger">{error}</div>}
         </div>
       </div>
     </div>

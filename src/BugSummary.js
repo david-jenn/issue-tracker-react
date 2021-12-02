@@ -33,9 +33,9 @@ function BugSummary({ bug }) {
     <div className="card border-dark mb-2 text-dark">
       <div className="card-body">
         <div className="title-badge-container d-md-flex justify-content-between">
-          <span className="card-title">
+          <div className="card-title">
             <Link to={`/bug/${bug._id}`}>{bug.title}</Link>
-          </span>
+          </div>
           <div>
             <span className={getClassificationClasses()}>{bug.classification}</span>
             <span className={getStatusClasses()}>{bug.closed ? 'closed' : 'open'}</span>

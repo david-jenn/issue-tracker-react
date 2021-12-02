@@ -306,7 +306,7 @@ function BugEditor({ auth, showError, showSuccess }) {
 
   function formatRoles(role) {
     if (!role) {
-      return '';
+      return '()';
     } else if (_.isArray(role)) {
       return '( ' + _.join(role, ', ') + ' )';
     } else {

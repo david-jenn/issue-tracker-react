@@ -3,13 +3,12 @@ import _ from 'lodash';
 import BugSummary from './BugSummary';
 import { nanoid } from 'nanoid';
 import axios from 'axios';
-import './BugList.css'
+import './BugList.css';
 
-function BugList({ auth, showError, showSuccess }) {
+function BugList({ auth, showError }) {
   const [pending, setPending] = useState(false);
   const [bugs, setBugs] = useState(null);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const [classification, setClassification] = useState('');
   const [minAge, setMinAge] = useState('');
   const [maxAge, setMaxAge] = useState('');
@@ -17,7 +16,7 @@ function BugList({ auth, showError, showSuccess }) {
   const [closed, setClosed] = useState('');
   const [sortBy, setSortBy] = useState('');
 
-  function onInputChange(evt, setValue, type) {
+  function onInputChange(evt, setValue) {
     const newValue = evt.currentTarget.value;
     setValue(newValue);
 
@@ -27,6 +26,7 @@ function BugList({ auth, showError, showSuccess }) {
   useEffect(() => {
     setPending(true);
     setError('');
+
     if (!auth) {
       return;
     }
@@ -41,15 +41,31 @@ function BugList({ auth, showError, showSuccess }) {
         setPending(false);
         if (_.isArray(res.data)) {
           setBugs(res.data);
-          setError('');
         } else {
           setError('Expected an array');
         }
       })
       .catch((err) => {
-        console.log(err);
         setPending(false);
-        setError(err.message);
+        const resError = err?.response?.data?.error;
+        if (resError) {
+          if (typeof resError === 'string') {
+            setError(resError);
+            showError(resError);
+          } else if (resError.details) {
+            setError(_.map(resError.details, (x, index) => <div key={index}>{x.message}</div>));
+            showError(_.map(resError.details, (x) => x.message));
+            for (const detail of resError.details) {
+              showError(detail.message);
+            }
+          } else {
+            setError(JSON.stringify(resError));
+            showError(JSON.stringify(resError));
+          }
+        } else {
+          setError(err.message);
+          showError(err.message);
+        }
       });
   }, [auth, classification, minAge, maxAge, closed, open, sortBy]);
 
@@ -145,13 +161,14 @@ function BugList({ auth, showError, showSuccess }) {
               <span className="visually-hidden">Loading...</span>
             </div>
           )}
-          {!pending && (
+          {!pending && !error && (
             <div>
               {_.map(bugs, (bug) => (
                 <BugSummary key={bug._id} bug={bug} />
               ))}
             </div>
           )}
+          {!pending && error && <div className="fs-3 text-danger">{error}</div>}
         </div>
       </div>
     </div>
