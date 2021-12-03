@@ -14,6 +14,7 @@ function BugEditor({ auth, showError, showSuccess }) {
   const [bug, setBug] = useState(null);
   const [users, setUsers] = useState([]);
   const [title, setTitle] = useState('');
+  const [titleHolder, setTitleHolder] = useState('');
   const [description, setDescription] = useState('');
   const [stepsToReproduce, setStepsToReproduce] = useState('');
   const [classification, setClassification] = useState('');
@@ -65,6 +66,7 @@ function BugEditor({ auth, showError, showSuccess }) {
         setAssignedTo(res.data?.assignedTo);
 
         setTitle(res.data.title);
+        setTitleHolder(res.data.title);
         setDescription(res.data.description);
         setStepsToReproduce(res.data.stepsToReproduce);
         setClassification(res.data.classification);
@@ -279,6 +281,8 @@ function BugEditor({ auth, showError, showSuccess }) {
         console.log(res);
         showSuccess(res.data.message);
         setEditSuccess(res.data.message);
+        setTitleHolder(title);
+
       })
       .catch((err) => {
         setEditPending(false);
@@ -318,9 +322,9 @@ function BugEditor({ auth, showError, showSuccess }) {
     <div className="section-container">
       {!auth && <h1 className="text-danger">You do not have permission</h1>}
 
-      {auth && (
+      {auth &&  (
         <div>
-          <h1>{bug?.title}</h1>
+          <h1>{titleHolder}</h1>
 
           <div className="muteText mb-4">
             {bug?.createdBy?.fullName ? `Reported by ${bug?.createdBy?.fullName}` : 'Author not found'}
