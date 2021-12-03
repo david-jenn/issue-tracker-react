@@ -373,9 +373,9 @@ function UserEditor({ auth, showError, showSuccess }) {
               Reset Password
             </button>
           </div>
-          <form id="restPasswordForm">
+          <form id="restPasswordForm" className="w-md-50">
             <div>Password Reset</div>
-            <div className="col-md-6">
+            <div className="">
               <InputField
                 label="Enter Old Password"
                 id="userOldPassword"
@@ -384,7 +384,7 @@ function UserEditor({ auth, showError, showSuccess }) {
                 onChange={(evt) => onInputChange(evt, setOldPassword)}
               />
             </div>
-            <div className="col-md-6">
+            <div className="">
               <InputField
                 label="Enter New Password"
                 id="userNewPassword"
@@ -393,7 +393,7 @@ function UserEditor({ auth, showError, showSuccess }) {
                 onChange={(evt) => onInputChange(evt, setNewPassword)}
               />
             </div>
-            <div className="col-md-6">
+            <div className="">
               <InputField
                 label="Confirm New Password"
                 id="userConfirmNewPassword"

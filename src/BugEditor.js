@@ -321,8 +321,13 @@ function BugEditor({ auth, showError, showSuccess }) {
   return (
     <div className="section-container">
       {!auth && <h1 className="text-danger">You do not have permission</h1>}
+      {pageLoadPending && (
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      )}
 
-      {auth &&  (
+      {auth && !pageLoadPending && (
         <div>
           <h1>{titleHolder}</h1>
 
