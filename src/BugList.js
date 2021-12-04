@@ -10,6 +10,9 @@ function BugList({ auth, showError }) {
   const [bugs, setBugs] = useState(null);
   const [error, setError] = useState('');
   const [classification, setClassification] = useState('');
+
+  const [displayFilter, setDisplayFilter] = useState(false);
+
   const [minAge, setMinAge] = useState('');
   const [maxAge, setMaxAge] = useState('');
   const [open, setOpen] = useState('true');
@@ -21,6 +24,15 @@ function BugList({ auth, showError }) {
     setValue(newValue);
 
     console.log(newValue);
+  }
+
+  function toggleDisplayFilter(evt) {
+    evt.preventDefault();
+    if(displayFilter) {
+      setDisplayFilter(false);
+    } else {
+      setDisplayFilter(true);
+    }
   }
 
   useEffect(() => {
@@ -77,13 +89,14 @@ function BugList({ auth, showError }) {
           Search Bugs
         </label>
         <input type="email" className="form-control mb-3" id="bugSearch" />
-        <button type="button" className="btn btn-primary">
+        <button type="button" className="btn btn-primary me-3">
           Search
         </button>
+        <a href="/" className="text-info" onClick={(evt) => toggleDisplayFilter(evt)}>Show/Hide Filters</a>
       </div>
 
       <div className="filterListContainer d-flex row">
-        <div className="filterContainer mb-3 col-md-3">
+        <div className={displayFilter ? "filterContainer mb-3 col-md-3" : "d-none"}>
           <div className="filterItem">
             <label htmlFor="classificationFilter" className="form-label">
               Classification
@@ -155,7 +168,7 @@ function BugList({ auth, showError }) {
             </select>
           </div>
         </div>
-        <div className="bugSummariesSection col col-md-9 p-3">
+        <div className={displayFilter ? "bugSummariesSection col col-md-9 p-3" : "bugSummariesSection col p-3"  }>
           {pending && (
             <div className="spinner-border text-primary" role="status">
               <span className="visually-hidden">Loading...</span>

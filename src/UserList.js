@@ -9,11 +9,22 @@ function UserList({ auth, showError }) {
   const [users, setUsers] = useState(null);
   const [error, setError] = useState('');
 
+  const [displayFilter, setDisplayFilter] = useState(false);
+
   function onInputChange(evt, setValue) {
     const newValue = evt.currentTarget.value;
     setValue(newValue);
 
     console.log(newValue);
+  }
+
+  function toggleDisplayFilter(evt) {
+    evt.preventDefault();
+    if(displayFilter) {
+      setDisplayFilter(false);
+    } else {
+      setDisplayFilter(true);
+    }
   }
 
   useEffect(() => {
@@ -70,13 +81,15 @@ function UserList({ auth, showError }) {
           User Search
         </label>
         <input type="email" className="form-control mb-3" id="userSearch" />
-        <button type="button" className="btn btn-primary">
+        <button type="button" className="btn btn-primary me-3">
           Search
         </button>
+        <a href="/" className="text-info" onClick={(evt) => toggleDisplayFilter(evt)}>Show/Hide Filters</a>
       </div>
-      <div className="">Show/Hide Filters</div>
-      <div className="filterListContainer d-flex row">
-        <div className="filterContainer mb-3 col-md-3">
+      
+      <div className=" filterListContainer d-flex row" >
+        <div className={displayFilter ? "filterContainer mb-3 col-md-3" : "d-none" } >
+        
           <div className="filterItem">
             <label htmlFor="classificationFilter" className="form-label">
               Role
@@ -129,7 +142,7 @@ function UserList({ auth, showError }) {
             </select>
           </div>
         </div>
-        <div className="userSummariesSection col col-md-9 p-3">
+        <div className={displayFilter ? "userSummariesSection col col-md-9 p-3" : "userSummariesSection col p-3"  }>
           {pending && (
             <div className="spinner-border text-primary" role="status">
               <span className="visually-hidden">Loading...</span>

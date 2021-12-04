@@ -22,24 +22,38 @@ function UserEditor({ auth, showError, showSuccess }) {
   const [roleChangeError, setRoleChangeError] = useState('');
   const [roleChangeSuccess, setRoleChangeSuccess] = useState('');
 
+  const [passwordChangeSuccess, setPasswordChangeSuccess] = useState('');
+  const [passwordChangeError, setPasswordChangeError] = useState('')
+
   const [user, setUser] = useState({});
   const [givenName, setGivenName] = useState('');
   const [familyName, setFamilyName] = useState('');
   const [fullName, setFullName] = useState('');
   const [fullNameDisplay, setFullNameDisplay] = useState('');
-  const [email, setEmail] = useState('');
-  const [roleArray, setRoleArray] = useState([]);
-  const [role, setRole] = useState('');
+  const [role, setRole] = useState([]);
 
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
+
+  const [displayPasswordChange, setDisplayPasswordChange] = useState(false);
 
   function onInputChange(evt, setValue) {
     const newValue = evt.currentTarget.value;
     setValue(newValue);
     console.log(newValue);
   }
+
+  function toggleDisplayPasswordChange(evt) {
+    evt.preventDefault();
+    if(displayPasswordChange) {
+      setDisplayPasswordChange(false);
+    } else {
+      setDisplayPasswordChange(true);
+    }
+  }
+
+  
 
   function onRoleChange(evt) {
     console.log(role);
@@ -182,6 +196,58 @@ function UserEditor({ auth, showError, showSuccess }) {
       });
   }
 
+  function onSendPasswordChangeReq(evt) {
+    evt.preventDefault();
+    setError('');
+    setSuccess('');
+    setInfoEditError('');
+    setInfoEditSuccess('');
+    setRoleChangeSuccess('');
+    setRoleChangeError('');
+
+    //TO DO Confirm old password...
+
+    if(newPassword !== confirmNewPassword) {
+      
+      showError('Passwords do not match do not match')
+      return;
+    }
+
+    axios(`${process.env.REACT_APP_API_URL}/api/user/${userId}`, {
+      method: 'put',
+      data: { password: newPassword },
+      headers: {
+        authorization: `Bearer ${auth?.token}`,
+      },
+    })
+      .then((res) => {
+        console.log(res);
+        showSuccess(res.data.message);
+        setPasswordChangeSuccess(res.data.message);
+      })
+      .catch((err) => {
+        const resError = err?.response?.data?.error;
+        if (resError) {
+          if (typeof resError === 'string') {
+            setPasswordChangeError(resError);
+            showError(resError);
+          } else if (resError.details) {
+            setPasswordChangeError(_.map(resError.details, (x, index) => <div key={index}>{x.message}</div>));
+            showError(_.map(resError.details, (x) => x.message));
+            for (const detail of resError.details) {
+              showError(detail.message);
+            }
+          } else {
+            setPasswordChangeError(JSON.stringify(resError));
+            showError(JSON.stringify(resError));
+          }
+        } else {
+          setPasswordChangeError(err.message);
+          showError('error');
+        }
+      });
+  }
+
   useEffect(() => {
     if (!auth) {
       return;
@@ -204,7 +270,6 @@ function UserEditor({ auth, showError, showSuccess }) {
         setFamilyName(res.data.familyName);
         setFullName(res.data.fullName);
         setFullNameDisplay(res.data.fullName);
-        setEmail(res.data.email);
         setRole(res.data.role);
         console.log(res.data);
         console.log('type: ', typeof role);
@@ -369,11 +434,11 @@ function UserEditor({ auth, showError, showSuccess }) {
             </div>
           </form>
           <div className="d-flex justify-content-center">
-            <button type="click" className="btn btn-warning">
-              Reset Password
+            <button type="click" className="btn btn-warning" onClick={(evt) => toggleDisplayPasswordChange(evt)}>
+              Need to change password?
             </button>
           </div>
-          <form id="restPasswordForm" className="w-md-50">
+          <form id="restPasswordForm" className={displayPasswordChange ? "" : "d-none"}>
             <div>Password Reset</div>
             <div className="">
               <InputField
@@ -403,7 +468,9 @@ function UserEditor({ auth, showError, showSuccess }) {
               />
             </div>
             <div>
-              <button className="btn btn-primary me-3">Confirm Password Change</button>
+              <button className="btn btn-primary me-3" onClick={(evt) => onSendPasswordChangeReq(evt)}>
+                Confirm Password Change
+              </button>
               <button className="btn btn-danger">Cancel</button>
             </div>
           </form>

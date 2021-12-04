@@ -454,7 +454,7 @@ function BugEditor({ auth, showError, showSuccess }) {
                         disabled={!canClassifyBug}
                         onClick={(evt) => onSendClassifyReq(evt)}
                       >
-                        Confirm Classification
+                        Set Classification
                       </button>
                     )}
                     {classificationPending && (
@@ -509,7 +509,7 @@ function BugEditor({ auth, showError, showSuccess }) {
                         disabled={!canCloseBug}
                         onClick={(evt) => onSendCloseReq(evt)}
                       >
-                        Confirm Status
+                        Set Status
                       </button>
                     )}
                     {statusSuccess && <div className="text-success">{statusSuccess}</div>}
@@ -557,7 +557,7 @@ function BugEditor({ auth, showError, showSuccess }) {
                           disabled={!canCloseBug}
                           onClick={(evt) => onSendAssignmentReq(evt)}
                         >
-                          Confirm Status
+                          Reassign Bug
                         </button>
                       )}
                       {assignmentSuccess && <div className="text-success">{assignmentSuccess}</div>}
