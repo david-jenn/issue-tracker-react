@@ -1,6 +1,6 @@
 function Footer() {
   return (
-    <footer className="bg-light p-3 text-dark">
+    <footer className="p-3">
         &copy; David Jenn 2021
       </footer>
   )

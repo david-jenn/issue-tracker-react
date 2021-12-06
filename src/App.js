@@ -1,3 +1,5 @@
+import './App.scss';
+
 import { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import jwt from 'jsonwebtoken';
@@ -63,7 +65,7 @@ function App() {
   }
 
   return (
-    <div className="App d-flex flex-column min-vh-100 bg-dark text-light">
+    <div className="App d-flex flex-column min-vh-100">
       <ToastContainer />
       <Navbar auth={auth} onLogout={onLogout} />
       <main className="container my-5 flex-grow-1 ">

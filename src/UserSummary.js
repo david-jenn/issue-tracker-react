@@ -23,7 +23,7 @@ function UserSummary({ user }) {
   }
 
   return (
-    <div className="card border-dark text-dark mb-2">
+    <div className="card border-light mb-2">
       <div className="card-body">
         <div className="titleContainer d-md-flex justify-content-between">
           <div className="card-title">

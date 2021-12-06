@@ -74,7 +74,7 @@ function UserList({ auth, showError }) {
   }, [auth]);
 
   return (
-    <div className="p-3 text-light">
+    <div className="p-3">
       <h1 className="text-center mb-3">User List</h1>
       <div className="mb-3">
         <label htmlFor="userSearch" className="visually-hidden">

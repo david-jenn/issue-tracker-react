@@ -30,7 +30,7 @@ function BugSummary({ bug }) {
   }
 
   return (
-    <div className="card border-dark mb-2 text-dark">
+    <div className="card border-light mb-2">
       <div className="card-body">
         <div className="title-badge-container d-md-flex justify-content-between">
           <div className="card-title">

@@ -329,7 +329,7 @@ function BugEditor({ auth, showError, showSuccess }) {
 
       {auth && !pageLoadPending && (
         <div>
-          <h1>{titleHolder}</h1>
+          <h1 className="">{titleHolder}</h1>
 
           <div className="muteText mb-4">
             {bug?.createdBy?.fullName ? `Reported by ${bug?.createdBy?.fullName}` : 'Author not found'}

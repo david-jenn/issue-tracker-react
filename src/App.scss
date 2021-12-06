@@ -1,0 +1,40 @@
+$palette1: #F5AD40;
+$palette2: #9C48E8;
+$palette3: #FF4942;
+$palette4: #2681D4;
+$palette5: #18F570;
+
+
+$font-family-base: "Open sans", sans-serif;
+$font-family-header: "Raleway", sans-serif;
+
+@font-face {
+  font-family: "Raleway";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src:url('./fonts/Raleway/Raleway-VariableFont_wght.ttf');
+}
+
+@font-face {
+  font-family: "Raleway";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src:url('./fonts/OpenSans/OpenSans-VariableFont_wdth\,wght.ttf');
+}
+
+
+@import "~bootswatch/dist/darkly/variables";
+@import "~bootstrap/scss/bootstrap";
+@import "~bootswatch/dist/darkly/bootswatch";
+
+// body {
+//   background-color: $dark;
+//   color: $light;
+// }
+h1, h2, h3, h4, h5, h6 {
+  font-family: $font-family-header;
+  //color: $light;
+}
+

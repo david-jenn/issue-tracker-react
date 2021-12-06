@@ -82,7 +82,7 @@ function BugList({ auth, showError }) {
   }, [auth, classification, minAge, maxAge, closed, open, sortBy]);
 
   return (
-    <div className="p-3 text-light">
+    <div className="p-3">
       <h1 className="text-center mb-3">Bug List</h1>
       <div className="mb-3">
         <label htmlFor="bugSearch" className="visually-hidden">
