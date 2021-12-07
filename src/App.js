@@ -12,6 +12,7 @@ import UserList from './UserList';
 import Login from './Login';
 import Register from './Register';
 import BugEditor from './BugEditor';
+import ReportBug from './ReportBug';
 import UserEditor from './UserEditor';
 import NotFound from './NotFound';
 import Footer from './Footer';
@@ -73,6 +74,7 @@ function App() {
           <Route path="/" element={<Navigate to="/login" />} />
           <Route path="/login" element={<Login onLogin={onLogin} showError={showError} />} />
           <Route path="/register" element={<Register showError={showError} onLogin={onLogin} />} />
+          <Route path="/bug/report" element={<ReportBug auth={auth} showError={showError} showSuccess={showSuccess}/>} />
           <Route path="/bug/list" element={<BugList showError={showError} auth={auth} />} />
           <Route
             path="/bug/:bugId"

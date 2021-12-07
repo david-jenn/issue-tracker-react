@@ -1,8 +1,6 @@
 import { Link } from 'react-router-dom';
 import moment from 'moment';
 
-import './BugSummary.css';
-
 function BugSummary({ bug }) {
   function getClassificationClasses() {
     const classes =
@@ -21,11 +19,16 @@ function BugSummary({ bug }) {
 
   function getStatusClasses() {
     const classes =
-      bug.closed === false || 'false'
+      bug.closed === false
         ? 'me-2 badge bg-primary'
-        : bug.closed === true || 'true'
+        : bug.closed === 'false'
+        ? 'me-2 badge bg-primary'
+        : bug.closed === true
+        ? 'me-2 badge bg-danger'
+        : bug.closed === 'true'
         ? 'me-2 badge bg-danger'
         : '';
+
     return classes;
   }
 
@@ -49,14 +52,13 @@ function BugSummary({ bug }) {
       </div>
       <div className="card-footer">
         <div className="d-flex justify-content-end">
-          
-            <div className="me-1">
-              {bug.createdBy?.fullName ? `Reported by ${bug.createdBy?.fullName}` : 'Bug author not found. '}
-            
+          <div className="me-1">
+            {bug.createdBy?.fullName ? `Reported by ${bug.createdBy?.fullName}` : 'Bug author not found. '}
+
             {bug.createdBy?.fullName && <span> {moment(bug.createdDate).fromNow()}</span>}
 
             {!bug.createdBy?.fullName && <span>Reported {moment(bug.createdDate).fromNow()} </span>}
-            </div>
+          </div>
         </div>
       </div>
     </div>

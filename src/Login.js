@@ -7,6 +7,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { Link } from 'react-router-dom';
+import { FaDoorOpen } from "react-icons/fa";
 import InputField from './InputField';
 
 function Login({ onLogin, showError }) {
@@ -111,7 +112,8 @@ function Login({ onLogin, showError }) {
 
         <div className="mb-3 d-flex align-items-center justify-content-between">
           <div className="d-flex flex-direction-column">
-            <button className="btn btn-primary me-3" type="submit" onClick={(evt) => onClickSubmit(evt)}>
+            <button className="btn btn-primary me-3" type="submit" onClick={(evt) => onClickSubmit(evt)} >
+              <FaDoorOpen className="m-1" />
               Log In
             </button>
             {pending && (

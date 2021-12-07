@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom';
+import { FaDoorOpen, FaList } from "react-icons/fa";
 
 import './NavBar.css';
 
@@ -11,7 +12,7 @@ function NavBar({ auth, onLogout }) {
 
   return (
     <header className="mb-3 position-sticky top-0">
-      <nav className="bg-dark navbar navbar-dark   navbar-expand-sm p-3">
+      <nav className="bg-secondary navbar navbar-dark   navbar-expand-sm p-3">
         <div className="container-fluid">
           <NavLink className="navbar-brand" to="/">
             Issue Tracker
@@ -34,16 +35,25 @@ function NavBar({ auth, onLogout }) {
               {!auth && (
                 <li className="nav-item">
                   <NavLink className="nav-link" to="/login">
+                    <FaDoorOpen className="m-1" />
                     Login
                   </NavLink>
                 </li>
               )}
+              
               {!auth && (
                 <li className="nav-item">
                   <NavLink className="nav-link" to="/register">
                     Register
                   </NavLink>
                 </li>
+              )}
+              {auth && (
+                <li className="nav-item">
+                <NavLink className="nav-link" to="/bug/report">
+                  Report Bug
+                </NavLink>
+              </li>
               )}
               {auth && (
                 <li className="nav-item">

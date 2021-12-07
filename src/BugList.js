@@ -13,29 +13,54 @@ function BugList({ auth, showError }) {
 
   const [displayFilter, setDisplayFilter] = useState(false);
 
+  const [keywords, setKeywords] = useState('');
   const [minAge, setMinAge] = useState('');
   const [maxAge, setMaxAge] = useState('');
   const [open, setOpen] = useState('true');
   const [closed, setClosed] = useState('');
   const [sortBy, setSortBy] = useState('');
+  const [update, setUpdate] = useState('')
 
   function onInputChange(evt, setValue) {
     const newValue = evt.currentTarget.value;
     setValue(newValue);
 
-    console.log(newValue);
+    setTimeout(() => {
+      if(update) {
+        setUpdate(false);
+      } else {
+        setUpdate(true);
+      }
+    }, 1000);
+
+    
+  }
+
+
+  function onStatusChange(evt) {
+    console.log(evt.currentTarget.value);
+    if (evt.currentTarget.value === 'open') {
+      setClosed(false);
+      setOpen(true);
+    } else if (evt.currentTarget.value === 'closed') {
+      setClosed(true);
+      setOpen(false);
+    } else {
+      setClosed(true);
+      setOpen(true);
+    }
   }
 
   function toggleDisplayFilter(evt) {
     evt.preventDefault();
-    if(displayFilter) {
+    if (displayFilter) {
       setDisplayFilter(false);
     } else {
       setDisplayFilter(true);
     }
   }
 
-  useEffect(() => {
+  function fetchSearchResults() {
     setPending(true);
     setError('');
 
@@ -44,7 +69,7 @@ function BugList({ auth, showError }) {
     }
     axios(`${process.env.REACT_APP_API_URL}/api/bug/list`, {
       method: 'get',
-      params: { pageSize: 1000, classification, minAge, maxAge, closed, open, sortBy },
+      params: { pageSize: 1000, classification, minAge, maxAge, closed, open, sortBy, keywords },
       headers: {
         authorization: `Bearer ${auth?.token}`,
       },
@@ -79,24 +104,43 @@ function BugList({ auth, showError }) {
           showError(err.message);
         }
       });
-  }, [auth, classification, minAge, maxAge, closed, open, sortBy]);
+  }
+
+  function onSubmit(evt) {
+    evt.preventDefault();
+    fetchSearchResults();
+  }
+
+  useEffect(() => {
+    fetchSearchResults();
+  }, [auth, update]);
 
   return (
     <div className="p-3">
       <h1 className="text-center mb-3">Bug List</h1>
-      <div className="mb-3">
-        <label htmlFor="bugSearch" className="visually-hidden">
-          Search Bugs
-        </label>
-        <input type="email" className="form-control mb-3" id="bugSearch" />
-        <button type="button" className="btn btn-primary me-3">
-          Search
-        </button>
-        <a href="/" className="text-info" onClick={(evt) => toggleDisplayFilter(evt)}>Show/Hide Filters</a>
-      </div>
+      <form className="mb-3">
+        <div className="input-group mb-3">
+          <input
+            type="text"
+            className="form-control"
+            aria-label="Keywords"
+            name="keywords"
+            value={keywords}
+            onChange={(evt) => onInputChange(evt, setKeywords)}
+          />
+          <button className="btn btn-primary" type="submit" id="button-addon2" onClick={(evt) => onSubmit(evt)}>
+            Search
+          </button>
+        </div>
+
+        <a href="/" className="text-info" onClick={(evt) => toggleDisplayFilter(evt)}>
+          Show/Hide Filters
+        </a>
+      </form>
 
       <div className="filterListContainer d-flex row">
-        <div className={displayFilter ? "filterContainer mb-3 col-md-3" : "d-none"}>
+        <div className={displayFilter ? 'filterContainer mb-3 col-md-3' : 'd-none'}>
+          <input type="hidden" name="keywords" value={keywords} />
           <div className="filterItem">
             <label htmlFor="classificationFilter" className="form-label">
               Classification
@@ -136,20 +180,30 @@ function BugList({ auth, showError }) {
             <label htmlFor="maxAgeFilter" className="form-label">
               Max Age
             </label>
-            <select id="maxAgeFilter" name="maxAgeFilter" className="form-select border border-dark">
-              <option value="all">All</option>
-              <option value="oneHour">1-hour</option>
-              <option value="fourHours">4-hours</option>
-              <option value="twelveHours">12-hours</option>
-              <option value="oneDay">1-day</option>
-              <option value="oneWeek">1-week</option>
+            <select
+              id="maxAgeFilter"
+              name="maxAgeFilter"
+              className="form-select border border-dark"
+              onChange={(evt) => onInputChange(evt, setMaxAge)}
+            >
+              <option value="">All</option>
+              <option value="1">1-day</option>
+              <option value="7">7-days</option>
+              <option value="30">30-days</option>
+              <option value="60">60-days</option>
+              <option value="90">90-days</option>
             </select>
           </div>
           <div className="filterItem">
             <label htmlFor="statusFilter" className="form-label">
               Status
             </label>
-            <select id="statusFilter" name="statusFilter" className="form-select border border-dark">
+            <select
+              id="statusFilter"
+              name="statusFilter"
+              className="form-select border border-dark"
+              onChange={(evt) => onStatusChange(evt)}
+            >
               <option value="open">Open</option>
               <option value="closed">Closed</option>
               <option value="all">All</option>
@@ -159,29 +213,33 @@ function BugList({ auth, showError }) {
             <label htmlFor="sortBy" className="form-label">
               Sort By
             </label>
-            <select id="sortBy" name="sortBy" className="form-select border border-dark">
+            <select
+              id="sortBy"
+              name="sortBy"
+              className="form-select border border-dark"
+              onChange={(evt) => onInputChange(evt, setSortBy)}
+            >
               <option value="newest">Newest</option>
               <option value="oldest">Oldest</option>
               <option value="title">Title</option>
-              <option value="userAssigned">User Assigned</option>
-              <option value="author">Author</option>
+              <option value="classification">Classification</option>
+              <option value="assignedTo">User Assigned</option>
+              <option value="createdBy">Author</option>
             </select>
           </div>
         </div>
-        <div className={displayFilter ? "bugSummariesSection col col-md-9 p-3" : "bugSummariesSection col p-3"  }>
+        <div className={displayFilter ? 'bugSummariesSection col col-md-9 p-3' : 'bugSummariesSection col p-3'}>
           {pending && (
             <div className="spinner-border text-primary" role="status">
               <span className="visually-hidden">Loading...</span>
             </div>
           )}
-          {!pending && !error && (
-            <div>
-              {_.map(bugs, (bug) => (
-                <BugSummary key={bug._id} bug={bug} />
-              ))}
-            </div>
-          )}
-          {!pending && error && <div className="fs-3 text-danger">{error}</div>}
+          {error && <div className="fs-3 text-danger">{error}</div>}
+          <div>
+            {_.map(bugs, (bug) => (
+              <BugSummary key={bug._id} bug={bug} />
+            ))}
+          </div>
         </div>
       </div>
     </div>
