@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import _ from 'lodash';
 import BugSummary from './BugSummary';
-import { nanoid } from 'nanoid';
 import axios from 'axios';
 import './BugList.css';
 
@@ -19,23 +18,13 @@ function BugList({ auth, showError }) {
   const [open, setOpen] = useState('true');
   const [closed, setClosed] = useState('');
   const [sortBy, setSortBy] = useState('');
-  const [update, setUpdate] = useState('')
+  const [rerenderCount, setRerenderCount] = useState(0);
 
   function onInputChange(evt, setValue) {
     const newValue = evt.currentTarget.value;
     setValue(newValue);
-
-    setTimeout(() => {
-      if(update) {
-        setUpdate(false);
-      } else {
-        setUpdate(true);
-      }
-    }, 1000);
-
-    
+    setTimeout(() => setRerenderCount(rerenderCount + 1), 500);
   }
-
 
   function onStatusChange(evt) {
     console.log(evt.currentTarget.value);
@@ -49,6 +38,10 @@ function BugList({ auth, showError }) {
       setClosed(true);
       setOpen(true);
     }
+
+    setTimeout(() => {
+      setRerenderCount(rerenderCount + 1);
+    }, 500)
   }
 
   function toggleDisplayFilter(evt) {
@@ -61,6 +54,7 @@ function BugList({ auth, showError }) {
   }
 
   function fetchSearchResults() {
+    console.log('fetch');
     setPending(true);
     setError('');
 
@@ -113,7 +107,7 @@ function BugList({ auth, showError }) {
 
   useEffect(() => {
     fetchSearchResults();
-  }, [auth, update]);
+  }, [auth, rerenderCount]);
 
   return (
     <div className="p-3">
@@ -132,10 +126,16 @@ function BugList({ auth, showError }) {
             Search
           </button>
         </div>
-
-        <a href="/" className="text-info" onClick={(evt) => toggleDisplayFilter(evt)}>
-          Show/Hide Filters
-        </a>
+        <div className="loadingRow d-flex align-content-center">
+          <a href="/" className="text-info" onClick={(evt) => toggleDisplayFilter(evt)}>
+            Show/Hide Filters
+          </a>
+          {pending && (
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+          )}
+        </div>
       </form>
 
       <div className="filterListContainer d-flex row">
@@ -229,11 +229,6 @@ function BugList({ auth, showError }) {
           </div>
         </div>
         <div className={displayFilter ? 'bugSummariesSection col col-md-9 p-3' : 'bugSummariesSection col p-3'}>
-          {pending && (
-            <div className="spinner-border text-primary" role="status">
-              <span className="visually-hidden">Loading...</span>
-            </div>
-          )}
           {error && <div className="fs-3 text-danger">{error}</div>}
           <div>
             {_.map(bugs, (bug) => (

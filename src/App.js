@@ -70,6 +70,7 @@ function App() {
       <ToastContainer />
       <Navbar auth={auth} onLogout={onLogout} />
       <main className="container my-5 flex-grow-1 ">
+        
         <Routes>
           <Route path="/" element={<Navigate to="/login" />} />
           <Route path="/login" element={<Login onLogin={onLogin} showError={showError} />} />
@@ -84,6 +85,7 @@ function App() {
           <Route path="/user/:userId" element={<UserEditor auth={auth} showError={showError} showSuccess={showSuccess} />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
+        
       </main>
       <Footer />
     </div>
