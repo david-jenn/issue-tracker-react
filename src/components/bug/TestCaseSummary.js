@@ -3,11 +3,12 @@ import { useState } from "react";
 function TestCaseSummary ({testCase}) {
 
   return (
-    <div className="card">
+    <div className="card border-light mb-2">
       <div className="card-body">
-        <span>{testCase.text}</span>
-        <span>{testCase.dateTested}</span>
-        <span>{testCase.passed}</span>
+        
+        <div>{testCase.text}</div>
+        <div>{testCase.dateTested}</div>
+        <div>{testCase.passed.toString()}</div>
       </div>
     </div>
   )

@@ -41,7 +41,7 @@ function BugList({ auth, showError }) {
 
     setTimeout(() => {
       setRerenderCount(rerenderCount + 1);
-    }, 500)
+    }, 500);
   }
 
   function toggleDisplayFilter(evt) {

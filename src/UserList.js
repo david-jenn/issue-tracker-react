@@ -127,15 +127,15 @@ function UserList({ auth, showError }) {
     <div className="p-3">
       <h1 className="text-center mb-3">User List</h1>
       <div className="mb-3">
-        <div class="input-group mb-3">
+        <div className="input-group mb-3">
           <input
             type="text"
-            class="form-control"
+            className="form-control"
             aria-label="keyword-search"
             aria-describedby="button-search"
             onChange={(evt) => onInputChange(evt, setKeywords)}
           />
-          <button class="btn btn-primary" type="button" id="button-addon2" onClick={(evt) => onKeywordSearch(evt)}>
+          <button className="btn btn-primary" type="button" id="button-addon2" onClick={(evt) => onKeywordSearch(evt)}>
             Search
           </button>
         </div>

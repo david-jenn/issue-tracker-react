@@ -67,7 +67,7 @@ function BugDetails({ bug, onInputChange, auth, showSuccess, showError }) {
   }
 
   return (
-    <form id="bug-edit-form" className="border-bottom border-light mb-3" action="/issues" method="put">
+    <form id="bug-edit-form" className="" action="/issues" method="put">
       <InputField
         label="Title"
         id="bugEditor-title"
