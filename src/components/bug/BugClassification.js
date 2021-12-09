@@ -1,8 +1,8 @@
 import _ from 'lodash';
 import axios from 'axios';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router';
-import { useEffect } from 'react/cjs/react.development';
+
 
 function BugClassification({bug, auth, onInputChange, showSuccess, showError }) {
 
