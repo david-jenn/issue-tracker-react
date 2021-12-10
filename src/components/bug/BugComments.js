@@ -11,7 +11,7 @@ function BugComments({ auth, bug, showError, showSuccess }) {
   const [comments, setComments] = useState(null);
   const [pending, setPending] = useState(true);
   const [error, setError] = useState('');
- 
+
   const [showCommentForm, setShowCommentForm] = useState(false);
   const [renderCount, setRenderCount] = useState(0);
   const [pageSize, setPageSize] = useState(10);
@@ -31,7 +31,6 @@ function BugComments({ auth, bug, showError, showSuccess }) {
         if (_.isArray(res.data)) {
           setComments(orderComments(res.data));
           setShowCommentForm(false);
-         
         } else {
           setError('Expected an array');
         }
@@ -60,8 +59,6 @@ function BugComments({ auth, bug, showError, showSuccess }) {
       });
   }, [bug, renderCount]);
 
-  
-
   function displayCommentForm(evt) {
     evt.preventDefault();
     if (!showCommentForm) {
@@ -84,25 +81,25 @@ function BugComments({ auth, bug, showError, showSuccess }) {
 
   return (
     <div>
-      <div className="form-section mb-3">
-        
-
-        {pending && (
-          <div className="spinner-border text-primary" role="status">
-            <span className="visually-hidden">Loading...</span>
-          </div>
-        )}
-
+      <div className="form-section">
+        <div className="mb-3">
+         
+          {pending && (
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+          )}
+        </div>
         {!pending && !showCommentForm && (
           <div className="d-flex justify-content-end">
-          <button
-            id="displayCommentsButton"
-            type="button"
-            className="btn btn-secondary mb-3 me-3"
-            onClick={(evt) => displayCommentForm(evt)}
-          >
-            Post Comment
-          </button>
+            <button
+              id="postCommentButton"
+              type="button"
+              className="btn btn-primary"
+              onClick={(evt) => displayCommentForm(evt)}
+            >
+              Post Comment
+            </button>
           </div>
         )}
       </div>
@@ -117,14 +114,13 @@ function BugComments({ auth, bug, showError, showSuccess }) {
           />
         </div>
       )}
-      
-        <div>
-          {_.map(comments, (comment) => (
-            <CommentSummary key={comment._id} comment={comment} showError={showError} />
-          ))}
-          {comments && comments.length === 0 && <div className="fst-italic mb-3">No comments to display</div>}
-        </div>
-      
+
+      <div>
+        {_.map(comments, (comment) => (
+          <CommentSummary key={comment._id} comment={comment} showError={showError} />
+        ))}
+        {comments && comments.length === 0 && <div className="fst-italic mb-3">No comments to display</div>}
+      </div>
     </div>
   );
 }

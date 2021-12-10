@@ -1,57 +1,45 @@
 import axios from 'axios';
 import { useState } from 'react';
 import { useParams } from 'react-router';
-import _ from 'lodash'
+import _ from 'lodash';
 import TextAreaField from '../../TextAreaField';
-function CommentForm({ displayCommentForm, auth, showError, reRenderComments, showSuccess  }) {
-
+function CommentForm({ displayCommentForm, auth, showError, reRenderComments, showSuccess }) {
   const { bugId } = useParams();
   const [text, setText] = useState('');
   const [pending, setPending] = useState(false);
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
 
-
-  
   function onPostComment(evt) {
-
     evt.preventDefault();
-    setPending(true)
-    if(!text) {
+    setPending(true);
+    if (!text) {
       setPending(false);
-      setError('Comment cannot be blank')
-      showError('Text is blank')
+      setError('Comment cannot be blank');
+      showError('Comment cannot be blank');
       return;
     }
-
-    
-
-    
-
-   
 
     axios(`${process.env.REACT_APP_API_URL}/api/bug/${bugId}/comment/new`, {
       method: 'put',
       data: {
-        text
+        text,
       },
       headers: {
         authorization: `Bearer ${auth?.token}`,
       },
-      
     })
-    .then((res) => {
-      setSuccess(res.data.message);
-      showSuccess(res.data.message);
-      setPending(false);
-      setText('');
-      reRenderComments();
-      displayCommentForm(evt);
-      
-    })
-    .catch((err) => {
-      setPending(false);
-      const resError = err?.response?.data?.error;
+      .then((res) => {
+        setSuccess(res.data.message);
+        showSuccess(res.data.message);
+        setPending(false);
+        setText('');
+        reRenderComments();
+        displayCommentForm(evt);
+      })
+      .catch((err) => {
+        setPending(false);
+        const resError = err?.response?.data?.error;
         if (resError) {
           if (typeof resError === 'string') {
             setError(resError);
@@ -66,13 +54,7 @@ function CommentForm({ displayCommentForm, auth, showError, reRenderComments, sh
         } else {
           setError(err.message);
         }
-
-    })
-
-    
-
-    
-
+      });
   }
 
   function onInputChange(evt, setValue) {
@@ -93,10 +75,21 @@ function CommentForm({ displayCommentForm, auth, showError, reRenderComments, sh
       />
       <div className="d-flex">
         <div>
-          <button type="button" className="btn btn-primary me-3" onClick={(evt) => onPostComment(evt)}>Post</button>
+          <button type="button" className="btn btn-primary me-3" onClick={(evt) => onPostComment(evt)}>
+          {pending && (
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+          )}
+            Post
+          </button>
         </div>
         <div>
-          <button type="button" className="btn btn-danger" onClick={(evt) => displayCommentForm(evt)}>Cancel</button>
+          <button type="button" className="btn btn-danger" onClick={(evt) => displayCommentForm(evt)}>
+          
+            Cancel
+          </button>
+          
         </div>
       </div>
     </form>

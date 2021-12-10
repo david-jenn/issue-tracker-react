@@ -7,10 +7,10 @@ function BugSummary({ bug }) {
       bug.classification === 'unclassified'
         ? 'me-2 badge bg-warning'
         : bug.classification === 'approved'
-        ? 'me-2 badge bg-primary'
+        ? 'me-2 badge bg-success'
         : bug.classification === 'unapproved'
         ? 'me-2 badge bg-danger'
-        : bug.classification === 'unapproved'
+        : bug.classification === 'duplicate'
         ? 'me-2 badge bg-danger'
         : 'me-2 badge bg-secondary';
 

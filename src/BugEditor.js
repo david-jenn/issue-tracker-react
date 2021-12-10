@@ -133,7 +133,8 @@ function BugEditor({ auth, showError, showSuccess }) {
               <div className="testCaseSection border-bottom border-light mb-5">
                 <BugTestCases bug={bug} />
               </div>
-              <div>
+              
+                <div className="d-grid gap-2">
                 <button
                   id="displayCommentsButton"
                   type="button"
@@ -142,7 +143,8 @@ function BugEditor({ auth, showError, showSuccess }) {
                 >
                   Display Comments
                 </button>
-              </div>
+                </div>
+              
              {displayComments && <div className="commentSection border-bottom border-light mb-3">
                 <BugComments auth={auth} bug={bug} showError={showError} showSuccess={showSuccess} />
               </div> }
