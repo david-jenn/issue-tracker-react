@@ -1,3 +1,11 @@
 .loadingRow {
   min-height: 37px;
 }
+
+.progress-bar {
+  width: 66%;
+}
+
+.spacer {
+  height: 28px;
+}

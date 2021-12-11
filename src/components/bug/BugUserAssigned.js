@@ -3,7 +3,9 @@ import { useParams } from 'react-router';
 import axios from 'axios';
 import _ from 'lodash';
 
-function BugUserAssigned({bug, auth, showError, showSuccess, onInputChange}) {
+import SelectField from '../../SelectField';
+
+function BugUserAssigned({ bug, auth, showError, showSuccess, onInputChange }) {
   const { bugId } = useParams();
 
   const [assignedToId, setAssignedToId] = useState('');
@@ -13,10 +15,15 @@ function BugUserAssigned({bug, auth, showError, showSuccess, onInputChange}) {
   const [error, setError] = useState('');
   const [pending, setPending] = useState(false);
 
-  useEffect(() => {
+  const assignedUsersOptions = _.map(users, (x, index) => (
+    <option key={x._id} value={x._id}>
+      {x.fullName} {formatRoles(x.role)}
+    </option>
+  ))
 
+  useEffect(() => {
     setAssignedTo(bug?.assignedTo);
-    setAssignedToId(bug?.assignedTo?._id)
+    setAssignedToId(bug?.assignedTo?._id);
 
     axios(`${process.env.REACT_APP_API_URL}/api/user/list`, {
       method: 'get',
@@ -42,7 +49,6 @@ function BugUserAssigned({bug, auth, showError, showSuccess, onInputChange}) {
   function onSendAssignmentReq(evt) {
     evt.preventDefault();
 
-    
     setSuccess('');
     setError('');
 
@@ -99,37 +105,33 @@ function BugUserAssigned({bug, auth, showError, showSuccess, onInputChange}) {
   return (
     <form>
       <h3>Assigned User</h3>
-      <label htmlFor="employeeAssign" className="form-label">
-        Select User
-      </label>
+      
 
-      <select
+      <SelectField
+        label="Select User"
         id="employeeAssign"
-        name="employeeAssign"
-        className="form-select border border-dark mb-3"
-        onChange={(evt) => onInputChange(evt, setAssignedToId)}
+        error=""
         value={assignedToId ? assignedToId : ''}
-      >
-        <option key="" value={null}>
+        onChange={(evt) => onInputChange(evt, setAssignedToId)}
+        children={[
+          <option key="" value={null}>
           No User Assigned
-        </option>
-        {_.map(users, (x, index) => (
-          <option key={x._id} value={x._id}>
-            {x.fullName} {formatRoles(x.role)}
-          </option>
-        ))}
-      </select>
+        </option>,
+        ...assignedUsersOptions
+
+        ]}
+      />
       
-        <button
-          id="assignmentBugBtn"
-          type="submit"
-          className="btn btn-primary mb-3 me-3"
-          
-          onClick={(evt) => onSendAssignmentReq(evt)}
-        >
-          Reassign Bug
-        </button>
-      
+
+      <button
+        id="assignmentBugBtn"
+        type="submit"
+        className="btn btn-primary mb-3 me-3"
+        onClick={(evt) => onSendAssignmentReq(evt)}
+      >
+        Reassign Bug
+      </button>
+
       {success && <div className="text-success">{success}</div>}
       {error && <div className="text-danger">{error}</div>}
 

@@ -1,12 +1,16 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import _ from 'lodash';
 
 import TextAreaField from './TextAreaField';
 import InputField from './InputField';
 
+import './ReportBug.css';
 
-function ReportBug({auth, showError, showSuccess}) {
+function ReportBug({ auth, showError, showSuccess }) {
+  const navigate = useNavigate();
+
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [stepsToReproduce, setStepsToReproduce] = useState('');
@@ -22,8 +26,8 @@ function ReportBug({auth, showError, showSuccess}) {
 
   function onReportBugReq(evt) {
     evt.preventDefault();
-    setPending(true)
-    if(!title || !description || !stepsToReproduce) {
+    setPending(true);
+    if (!title || !description || !stepsToReproduce) {
       setPending(false);
       return;
     }
@@ -31,21 +35,23 @@ function ReportBug({auth, showError, showSuccess}) {
     axios(`${process.env.REACT_APP_API_URL}/api/bug/new`, {
       method: 'put',
       data: {
-        stepsToReproduce, description, title
+        stepsToReproduce,
+        description,
+        title,
       },
       headers: {
         authorization: `Bearer ${auth?.token}`,
       },
-      
     })
-    .then((res) => {
-      setSuccess(res.data.message);
-      showSuccess(res.data.message);
-      setPending(false);
-    })
-    .catch((err) => {
-      setPending(false);
-      const resError = err?.response?.data?.error;
+      .then((res) => {
+        setSuccess(res.data.message);
+        showSuccess(res.data.message);
+        setPending(false);
+        navigate('/bug/list')
+      })
+      .catch((err) => {
+        setPending(false);
+        const resError = err?.response?.data?.error;
         if (resError) {
           if (typeof resError === 'string') {
             setError(resError);
@@ -60,15 +66,14 @@ function ReportBug({auth, showError, showSuccess}) {
         } else {
           setError(err.message);
         }
-
-    })
+      });
   }
 
   return (
-    <div>
+    <div className="p-3 ms-lg-5 me-lg-5">
       <h1>Report A New Bug</h1>
 
-      <form id="reportBugForm" className="">
+      <form id="reportBugForm" className="row">
         <InputField
           label="Title"
           id="bugEditor-title"
@@ -76,25 +81,28 @@ function ReportBug({auth, showError, showSuccess}) {
           value={title}
           onChange={(evt) => onInputChange(evt, setTitle)}
         />
-        <TextAreaField
-          label="Description"
-          id="bugEditor-description"
-          name="bugEditor-description"
-          rows="5"
-          value={description}
-          onChange={(evt) => onInputChange(evt, setDescription)}
-        />
+        <div className="col-lg-6"> 
+          <TextAreaField
+            label="Description"
+            id="bugEditor-description"
+            name="bugEditor-description"
+            rows="7"
+            value={description}
+            onChange={(evt) => onInputChange(evt, setDescription)}
+          />
+        </div>
+        <div className="col-lg-6">
+          <TextAreaField
+            label="Steps To Reproduce"
+            id="BugEditor-stepsToReproduce"
+            name="BugEditor-stepsToReproduce"
+            rows="7"
+            value={stepsToReproduce}
+            onChange={(evt) => onInputChange(evt, setStepsToReproduce)}
+          />
+        </div>
 
-        <TextAreaField
-          label="Steps To Reproduce"
-          id="BugEditor-stepsToReproduce"
-          name="BugEditor-stepsToReproduce"
-          rows="5"
-          value={stepsToReproduce}
-          onChange={(evt) => onInputChange(evt, setStepsToReproduce)}
-        />
-
-        <div>
+        <div className="">
           <button id="submitBugReport" className="btn btn-primary me-3" onClick={(evt) => onReportBugReq(evt)}>
             Submit
           </button>

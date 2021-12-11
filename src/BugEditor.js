@@ -138,7 +138,7 @@ function BugEditor({ auth, showError, showSuccess }) {
                 <button
                   id="displayCommentsButton"
                   type="button"
-                  className="btn btn-secondary mb-3 me-3"
+                  className="btn btn-secondary mb-3"
                   onClick={(evt) => showComments(evt)}
                 >
                   Display Comments

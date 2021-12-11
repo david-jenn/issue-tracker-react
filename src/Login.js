@@ -125,10 +125,10 @@ function Login({ onLogin, showError }) {
             )}
           </div>
           <div>
-            <div>Don't have an account yet?</div>
+            <div>Don't have an account?</div>
             <Link to="/register">Register</Link>
           </div>
-          <div></div>
+          
         </div>
 
         {error && <div className="mb-3 text-danger">{error}</div>}

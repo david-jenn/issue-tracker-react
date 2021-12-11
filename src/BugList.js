@@ -2,6 +2,12 @@ import { useEffect, useState } from 'react';
 import _ from 'lodash';
 import BugSummary from './BugSummary';
 import axios from 'axios';
+import ProgressBar from 'react-bootstrap/ProgressBar';
+
+import SelectField from './SelectField';
+
+import BugStatistics from './components/bug/BugStatistics';
+import BugFilterIndicator from './components/bug/BugFilterIndicator';
 import './BugList.css';
 
 function BugList({ auth, showError }) {
@@ -11,6 +17,7 @@ function BugList({ auth, showError }) {
   const [classification, setClassification] = useState('');
 
   const [displayFilter, setDisplayFilter] = useState(false);
+  const [displayStats, setDisplayStats] = useState(true);
 
   const [keywords, setKeywords] = useState('');
   const [minAge, setMinAge] = useState('');
@@ -44,12 +51,12 @@ function BugList({ auth, showError }) {
     }, 500);
   }
 
-  function toggleDisplayFilter(evt) {
+  function toggleDisplay(evt, value, setValue) {
     evt.preventDefault();
-    if (displayFilter) {
-      setDisplayFilter(false);
+    if (value) {
+      setValue(false);
     } else {
-      setDisplayFilter(true);
+      setValue(true);
     }
   }
 
@@ -127,8 +134,12 @@ function BugList({ auth, showError }) {
           </button>
         </div>
         <div className="loadingRow d-flex align-content-center">
-          <a href="/" className="text-info" onClick={(evt) => toggleDisplayFilter(evt)}>
-            Show/Hide Filters
+          <a
+            href="/"
+            className="text-info fst-italic"
+            onClick={(evt) => toggleDisplay(evt, displayFilter, setDisplayFilter)}
+          >
+            show/hide filters
           </a>
           {pending && (
             <div className="spinner-border text-primary" role="status">
@@ -139,102 +150,164 @@ function BugList({ auth, showError }) {
       </form>
 
       <div className="filterListContainer d-flex row">
-        <div className={displayFilter ? 'filterContainer mb-3 col-md-3' : 'd-none'}>
-          <input type="hidden" name="keywords" value={keywords} />
-          <div className="filterItem">
-            <label htmlFor="classificationFilter" className="form-label">
-              Classification
-            </label>
-            <select
-              id="classificationFilter"
-              name="classificationFilter"
-              className="form-select border border-dark"
-              onChange={(evt) => onInputChange(evt, setClassification)}
-            >
-              <option value="">All</option>
-              <option value="unclassified">Unclassified</option>
-              <option value="approved">Approved</option>
-              <option value="unapproved">Unapproved</option>
-              <option value="duplicate">Duplicate</option>
-            </select>
-          </div>
-          <div className="filterItem">
-            <label htmlFor="minAge" className="form-label">
-              Min Age
-            </label>
-            <select
-              id="minAgeFilter"
-              name="minAgeFilter"
-              className="form-select border border-dark"
-              onChange={(evt) => onInputChange(evt, setMinAge)}
-            >
-              <option value="">All</option>
-              <option value="1">1-day</option>
-              <option value="7">7-days</option>
-              <option value="30">30-days</option>
-              <option value="60">60-days</option>
-              <option value="90">90-days</option>
-            </select>
-          </div>
-          <div className="filterItem">
-            <label htmlFor="maxAgeFilter" className="form-label">
-              Max Age
-            </label>
-            <select
-              id="maxAgeFilter"
-              name="maxAgeFilter"
-              className="form-select border border-dark"
-              onChange={(evt) => onInputChange(evt, setMaxAge)}
-            >
-              <option value="">All</option>
-              <option value="1">1-day</option>
-              <option value="7">7-days</option>
-              <option value="30">30-days</option>
-              <option value="60">60-days</option>
-              <option value="90">90-days</option>
-            </select>
-          </div>
-          <div className="filterItem">
-            <label htmlFor="statusFilter" className="form-label">
-              Status
-            </label>
-            <select
-              id="statusFilter"
-              name="statusFilter"
-              className="form-select border border-dark"
-              onChange={(evt) => onStatusChange(evt)}
-            >
-              <option value="open">Open</option>
-              <option value="closed">Closed</option>
-              <option value="all">All</option>
-            </select>
-          </div>
-          <div className="filterItem">
-            <label htmlFor="sortBy" className="form-label">
-              Sort By
-            </label>
-            <select
-              id="sortBy"
-              name="sortBy"
-              className="form-select border border-dark"
-              onChange={(evt) => onInputChange(evt, setSortBy)}
-            >
-              <option value="newest">Newest</option>
-              <option value="oldest">Oldest</option>
-              <option value="title">Title</option>
-              <option value="classification">Classification</option>
-              <option value="assignedTo">User Assigned</option>
-              <option value="createdBy">Author</option>
-            </select>
-          </div>
+        <div className={displayFilter ? 'filterContainer mb-3 d-md-flex' : 'd-none'}>
+          <SelectField
+            label="Classification"
+            id="classificationFilter"
+            error=""
+            className="me-2"
+            onChange={(evt) => onInputChange(evt, setClassification)}
+            children={[
+              <option key="all" value="">
+                All
+              </option>,
+              <option key="unclassified" value="unclassified">
+                Unclassified
+              </option>,
+              <option key="approved" value="approved">
+                Approved
+              </option>,
+              <option key="unapproved" value="unapproved">
+                Unapproved
+              </option>,
+              <option key="duplicate" value="duplicate">
+                Duplicate
+              </option>,
+            ]}
+          />
+
+          <SelectField
+            label="Min Age"
+            id="minAgeFilter"
+            error=""
+            onChange={(evt) => onInputChange(evt, setMinAge)}
+            children={[
+              <option key="all" value="">
+                All
+              </option>,
+              <option key="1" value="1">
+                1-day
+              </option>,
+              <option key="7" value="7">
+                7-days
+              </option>,
+              <option key="30" value="30">
+                30-days
+              </option>,
+              <option key="60" value="60">
+                60-days
+              </option>,
+              <option key="90" value="90">
+                90-days
+              </option>,
+            ]}
+          />
+
+          <SelectField
+            label="Max Age"
+            id="maxAgeFilter"
+            error=""
+            onChange={(evt) => onInputChange(evt, setMaxAge)}
+            children={[
+              <option key="all" value="">
+                All
+              </option>,
+              <option key="1" value="1">
+                1-day
+              </option>,
+              <option key="7" value="7">
+                7-days
+              </option>,
+              <option key="30" value="30">
+                30-days
+              </option>,
+              <option key="60" value="60">
+                60-days
+              </option>,
+              <option key="90" value="90">
+                90-days
+              </option>,
+            ]}
+          />
+
+          <SelectField
+            label="Status"
+            id="statusFilter"
+            error=""
+            onChange={(evt) => onStatusChange(evt)}
+            children={[
+              <option key="open" value="open">
+                Open
+              </option>,
+              <option key="closed" value="closed">
+                Closed
+              </option>,
+              <option key="all" value="all">
+                All
+              </option>,
+            ]}
+          />
+
+          <SelectField
+            label="Sort By"
+            id="sortBy"
+            error=""
+            onChange={(evt) => onInputChange(evt, setSortBy)}
+            children={[
+              <option key="newest" value="newest">
+                Newest
+              </option>,
+              <option key="oldest" value="oldest">
+                Oldest
+              </option>,
+              <option key="title" value="title">
+                Title
+              </option>,
+              <option key="classification" value="classification">
+                Classification
+              </option>,
+              <option key="assignedTo" value="assignedTo">
+                User Assigned
+              </option>,
+              <option key="createdBy" value="createdBy">
+                Author
+              </option>,
+            ]}
+          />
         </div>
-        <div className={displayFilter ? 'bugSummariesSection col col-md-9 p-3' : 'bugSummariesSection col p-3'}>
+        {bugs && <BugFilterIndicator bugs={bugs} />}
+
+        <div className={displayStats ? 'bugSummariesSection col-md-9' : 'bugSummariesSection'}>
           {error && <div className="fs-3 text-danger">{error}</div>}
+          {displayStats && <div className="spacer"></div> }
+          {!displayStats && <div className="spacer text-right">
+            <div className="d-none d-md-flex justify-content-end">
+          <a
+              href="/"
+              className="text-info fst-italic mb-1"
+              onClick={(evt) => toggleDisplay(evt, displayStats, setDisplayStats)}
+            >
+              show/hide stats
+            </a>
+            </div>
+          </div> }
           <div>
             {_.map(bugs, (bug) => (
               <BugSummary key={bug._id} bug={bug} />
             ))}
           </div>
+        </div>
+        <div className={displayStats ? "col-md-3" : ""}>
+          <div className="d-flex justify-content-end">
+            <a
+              href="/"
+              className="text-info fst-italic mb-1"
+              onClick={(evt) => toggleDisplay(evt, displayStats, setDisplayStats)}
+            >
+              show/hide stats
+            </a>
+          </div>
+          {bugs && <BugStatistics bugs={bugs} />}
         </div>
       </div>
     </div>

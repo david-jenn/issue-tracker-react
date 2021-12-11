@@ -2,7 +2,7 @@ function SelectField({ label, id, className, error, children, ...rest }) {
   const inputClasses = 'form-select ' + (error ? 'is-invalid' : 'is-valid');
 
   return (
-    <div className="mb-3">
+    <div className="mb-3 m-1">
       <label className="form-label" htmlFor={id}>
         {label}
       </label>

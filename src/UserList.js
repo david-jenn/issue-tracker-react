@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import _ from 'lodash';
-import UserSummary from './UserSummary';
 import { nanoid } from 'nanoid';
 import axios from 'axios';
+
+import SelectField from './SelectField';
+import UserSummary from './UserSummary';
 
 function UserList({ auth, showError }) {
   const [pending, setPending] = useState(false);
@@ -14,14 +16,14 @@ function UserList({ auth, showError }) {
   const [maxAge, setMaxAge] = useState('');
   const [role, setRole] = useState('');
   const [sortBy, setSortBy] = useState('');
+  const [rerenderCount, setRerenderCount] = useState(0);
 
   const [displayFilter, setDisplayFilter] = useState(false);
 
   function onInputChange(evt, setValue) {
     const newValue = evt.currentTarget.value;
     setValue(newValue);
-
-    console.log(newValue);
+    setTimeout(() => setRerenderCount(rerenderCount + 1), 500);
   }
 
   function toggleDisplayFilter(evt) {
@@ -33,12 +35,24 @@ function UserList({ auth, showError }) {
     }
   }
 
-  function onKeywordSearch(evt) {
+  function onSubmit(evt) {
     evt.preventDefault();
+    fetchSearchResults();
+  }
+
+  useEffect(() => {
+    fetchSearchResults();
+  }, [auth, rerenderCount]);
+
+  function fetchSearchResults() {
+    console.log('fetch');
+    setPending(true);
+    setError('');
+
     if (!auth) {
       return;
     }
-    axios(`${process.env.REACT_APP_API_URL}/api/bug/list`, {
+    axios(`${process.env.REACT_APP_API_URL}/api/user/list`, {
       method: 'get',
       params: { pageSize: 1000, minAge, maxAge, role, sortBy, keywords },
       headers: {
@@ -77,56 +91,10 @@ function UserList({ auth, showError }) {
       });
   }
 
-  useEffect(() => {
-    setPending(true);
-    setError('');
-
-    if (!auth) {
-      return;
-    }
-    axios(`${process.env.REACT_APP_API_URL}/api/user/list`, {
-      method: 'get',
-      params: { pageSize: 1000, minAge, maxAge, role, sortBy, keywords },
-      headers: {
-        authorization: `Bearer ${auth?.token}`,
-      },
-    })
-      .then((res) => {
-        setPending(false);
-        if (_.isArray(res.data)) {
-          setUsers(res.data);
-        } else {
-          setError('expected an array');
-        }
-      })
-      .catch((err) => {
-        setPending(false);
-        const resError = err?.response?.data?.error;
-        if (resError) {
-          if (typeof resError === 'string') {
-            setError(resError);
-            showError(resError);
-          } else if (resError.details) {
-            setError(_.map(resError.details, (x, index) => <div key={index}>{x.message}</div>));
-            showError(_.map(resError.details, (x) => x.message));
-            for (const detail of resError.details) {
-              showError(detail.message);
-            }
-          } else {
-            setError(JSON.stringify(resError));
-            showError(JSON.stringify(resError));
-          }
-        } else {
-          setError(err.message);
-          showError(err.message);
-        }
-      });
-  }, [auth, role, minAge, maxAge, sortBy]);
-
   return (
     <div className="p-3">
       <h1 className="text-center mb-3">User List</h1>
-      <div className="mb-3">
+      <form className="mb-3">
         <div className="input-group mb-3">
           <input
             type="text"
@@ -135,96 +103,100 @@ function UserList({ auth, showError }) {
             aria-describedby="button-search"
             onChange={(evt) => onInputChange(evt, setKeywords)}
           />
-          <button className="btn btn-primary" type="button" id="button-addon2" onClick={(evt) => onKeywordSearch(evt)}>
+          <button className="btn btn-primary" type="button" id="button-addon2" onClick={(evt) => onSubmit(evt)}>
             Search
           </button>
         </div>
-
-        <a href="/" className="text-info" onClick={(evt) => toggleDisplayFilter(evt)}>
-          Show/Hide Filters
-        </a>
-      </div>
-
-      <div className=" filterListContainer d-flex row">
-        <div className={displayFilter ? 'filterContainer mb-3 col-md-3' : 'd-none'}>
-          <div className="filterItem">
-            <label htmlFor="classificationFilter" className="form-label">
-              Role
-            </label>
-            <select
-              id="roleFilter"
-              name="roleFilter"
-              className="form-select border border-dark"
-              onChange={(evt) => onInputChange(evt, setRole)}
-            >
-              <option value="">All</option>
-              <option value="DEV">DEV</option>
-              <option value="QA">QA</option>
-              <option value="BA">BA</option>
-              <option value="PM">PM</option>
-              <option value="TM">TM</option>
-            </select>
-          </div>
-          <div className="filterItem">
-            <label htmlFor="minAge" className="form-label">
-              Min Age
-            </label>
-            <select
-              id="minAgeFilter"
-              name="minAgeFilter"
-              className="form-select border border-dark"
-              onChange={(evt) => onInputChange(evt, setMinAge)}
-            >
-              <option value="">All</option>
-              <option value="1">1-day</option>
-              <option value="7">7-days</option>
-              <option value="30">30-days</option>
-              <option value="60">60-days</option>
-              <option value="90">90-days</option>
-            </select>
-          </div>
-          <div className="filterItem">
-            <label htmlFor="maxAgeFilter" className="form-label">
-              Max Age
-            </label>
-            <select
-              id="maxAgeFilter"
-              name="maxAgeFilter"
-              className="form-select border border-dark"
-              onChange={(evt) => onInputChange(evt, setMaxAge)}
-            >
-              <option value="">All</option>
-              <option value="1">1-day</option>
-              <option value="7">7-days</option>
-              <option value="30">30-days</option>
-              <option value="60">60-days</option>
-              <option value="90">90-days</option>
-            </select>
-          </div>
-          <div className="filterItem">
-            <label htmlFor="sortBy" className="form-label">
-              Sort By
-            </label>
-            <select
-              id="sortBy"
-              name="sortBy"
-              className="form-select border border-dark"
-              onChange={(evt) => onInputChange(evt, setSortBy)}
-            >
-              <option value="givenName">Given Name</option>
-              <option value="familyName">Family Name</option>
-              <option value="role">Role</option>
-              <option value="newest">Newest</option>
-              <option value="oldest">Oldest</option>
-            </select>
-          </div>
-        </div>
-        <div className={displayFilter ? 'userSummariesSection col col-md-9 p-3' : 'userSummariesSection col p-3'}>
+        <div className="loadingRow d-flex align-content-center">
+          <a href="/" className="text-info" onClick={(evt) => toggleDisplayFilter(evt)}>
+            Show/Hide Filters
+          </a>
           {pending && (
             <div className="spinner-border text-primary" role="status">
               <span className="visually-hidden">Loading...</span>
             </div>
           )}
+        </div>
+      </form>
+
+      <div className=" filterListContainer d-flex row">
+        <div className={displayFilter ? 'filterContainer mb-3 col-md-3' : 'd-none'}>
+          <SelectField
+            label="Role"
+            id="roleFilter"
+            error=""
+            onChange={(evt) => onInputChange(evt, setRole)}
+            children={[
+              <option value="">All</option>,
+              <option value="DEV">DEV</option>,
+              <option value="QA">QA</option>,
+              <option value="BA">BA</option>,
+              <option value="PM">PM</option>,
+              <option value="TM">TM</option>,
+            ]}
+          />
+
+          <SelectField
+            label="Role"
+            id="minAgeFilter"
+            error=""
+            onChange={(evt) => onInputChange(evt, setRole)}
+            children={[
+              <option value="">All</option>,
+              <option value="DEV">DEV</option>,
+              <option value="QA">QA</option>,
+              <option value="BA">BA</option>,
+              <option value="PM">PM</option>,
+              <option value="TM">TM</option>,
+            ]}
+          />
+
+          <SelectField
+            label="Min Age"
+            id="minAgeFilter"
+            error=""
+            onChange={(evt) => onInputChange(evt, setMinAge)}
+            children={[
+              <option value="">All</option>,
+              <option value="1">1-day</option>,
+              <option value="7">7-days</option>,
+              <option value="30">30-days</option>,
+              <option value="60">60-days</option>,
+              <option value="90">90-days</option>,
+            ]}
+          />
+
+          <SelectField
+            label="Max Age"
+            id="maxAgeFilter"
+            error=""
+            onChange={(evt) => onInputChange(evt, setMaxAge)}
+            children={[
+              <option value="">All</option>,
+              <option value="1">1-day</option>,
+              <option value="7">7-days</option>,
+              <option value="30">30-days</option>,
+              <option value="60">60-days</option>,
+              <option value="90">90-days</option>,
+            ]}
+          />
+
+          <SelectField
+            label="Sort By"
+            id="sortBy"
+            error=""
+            onChange={(evt) => onInputChange(evt, setSortBy)}
+            children={[
+              <option value="givenName">Given Name</option>,
+              <option value="familyName">Family Name</option>,
+              <option value="role">Role</option>,
+              <option value="newest">Newest</option>,
+              <option value="oldest">Oldest</option>,
+            ]}
+          />
+
+        </div>
+        <div className={displayFilter ? 'userSummariesSection col col-md-9 p-3' : 'userSummariesSection col p-3'}>
           {users?.length > 0 && (
             <div>
               {_.map(users, (user) => (
@@ -232,7 +204,7 @@ function UserList({ auth, showError }) {
               ))}
             </div>
           )}
-          {users?.length === 0 && !error && !pending && <div className="fs-3 text-danger">No Users Found</div>}
+
           {!pending && error && <div className="fs-3 text-danger">{error}</div>}
         </div>
       </div>
