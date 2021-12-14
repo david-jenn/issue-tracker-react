@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import _ from 'lodash';
-import BugSummary from './BugSummary';
+import BugListItem from './BugListItem';
 import axios from 'axios';
-import ProgressBar from 'react-bootstrap/ProgressBar';
+
 
 import SelectField from './SelectField';
 
@@ -11,6 +11,7 @@ import BugFilterIndicator from './components/bug/BugFilterIndicator';
 import './BugList.css';
 
 function BugList({ auth, showError }) {
+  
   const [pending, setPending] = useState(false);
   const [bugs, setBugs] = useState(null);
   const [error, setError] = useState('');
@@ -26,6 +27,7 @@ function BugList({ auth, showError }) {
   const [closed, setClosed] = useState('');
   const [sortBy, setSortBy] = useState('');
   const [rerenderCount, setRerenderCount] = useState(0);
+  
 
   function onInputChange(evt, setValue) {
     const newValue = evt.currentTarget.value;
@@ -117,8 +119,8 @@ function BugList({ auth, showError }) {
   }, [auth, rerenderCount]);
 
   return (
-    <div className="p-3">
-      <h1 className="text-center mb-3">Bug List</h1>
+    <div className="">
+      <h1 className="mb-3">Bug List</h1>
       <form className="mb-3">
         <div className="input-group mb-3">
           <input
@@ -291,11 +293,12 @@ function BugList({ auth, showError }) {
             </a>
             </div>
           </div> }
-          <div>
+         { bugs && bugs.length > 0 && <div>
             {_.map(bugs, (bug) => (
-              <BugSummary key={bug._id} bug={bug} />
+              <BugListItem key={bug._id} bug={bug} />
             ))}
-          </div>
+          </div> }
+          {bugs && bugs.length === 0 && <div className="border-bottom border-light fst-italic">No Bugs Found</div>}
         </div>
         <div className={displayStats ? "col-md-3" : ""}>
           <div className="d-flex justify-content-end">
