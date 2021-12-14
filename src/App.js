@@ -41,7 +41,13 @@ function App() {
 
   function onLogin(auth) {
     setAuth(auth);
-    navigate('/bug/list');
+    console.log(auth);
+    if(auth?.payload?.permissions?.viewBug) {
+      navigate('/bug/list');
+    } else {
+      navigate('/user/me');
+    }
+    
     showSuccess('Logged in!');
     if (localStorage) {
       localStorage.setItem('authToken', auth.token);
@@ -81,8 +87,10 @@ function App() {
             path="/bug/:bugId"
             element={<BugEditor auth={auth} showError={showError} showSuccess={showSuccess} />}
           />
+          
           <Route path="/user/list" element={<UserList  showError={showError} auth={auth} />} />
           <Route path="/user/:userId" element={<UserEditor auth={auth} showError={showError} showSuccess={showSuccess} />} />
+          <Route path="/user/me" element={<UserEditor auth={auth} showError={showError} showSuccess={showSuccess} />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         

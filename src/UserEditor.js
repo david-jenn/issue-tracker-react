@@ -10,7 +10,10 @@ import InputField from './InputField';
 import './UserEditor.css';
 
 function UserEditor({ auth, showError, showSuccess }) {
-  const { userId } = useParams();
+  
+  let { userId } = useParams();
+  
+  
 
   const [pending, setPending] = useState(false);
   const [error, setError] = useState('');
@@ -23,14 +26,14 @@ function UserEditor({ auth, showError, showSuccess }) {
   const [roleChangeSuccess, setRoleChangeSuccess] = useState('');
 
   const [passwordChangeSuccess, setPasswordChangeSuccess] = useState('');
-  const [passwordChangeError, setPasswordChangeError] = useState('')
+  const [passwordChangeError, setPasswordChangeError] = useState('');
 
   const [user, setUser] = useState({});
   const [givenName, setGivenName] = useState('');
   const [familyName, setFamilyName] = useState('');
   const [fullName, setFullName] = useState('');
   const [fullNameDisplay, setFullNameDisplay] = useState('');
-  const [role, setRole] = useState([]);
+  const [role, setRole] = useState(null);
 
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -46,14 +49,12 @@ function UserEditor({ auth, showError, showSuccess }) {
 
   function toggleDisplayPasswordChange(evt) {
     evt.preventDefault();
-    if(displayPasswordChange) {
+    if (displayPasswordChange) {
       setDisplayPasswordChange(false);
     } else {
       setDisplayPasswordChange(true);
     }
   }
-
-  
 
   function onRoleChange(evt) {
     console.log(role);
@@ -115,7 +116,12 @@ function UserEditor({ auth, showError, showSuccess }) {
     setRoleChangeSuccess('');
     setRoleChangeError('');
 
-    axios(`${process.env.REACT_APP_API_URL}/api/user/${userId}`, {
+    let path = `${process.env.REACT_APP_API_URL}/api/user/${userId}`
+    if (!userId) {
+      path = `${process.env.REACT_APP_API_URL}/api/user/me`
+    }
+    
+    axios(path, {
       method: 'put',
       data: { givenName, familyName, fullName },
       headers: {
@@ -207,9 +213,8 @@ function UserEditor({ auth, showError, showSuccess }) {
 
     //TO DO Confirm old password...
 
-    if(newPassword !== confirmNewPassword) {
-      
-      showError('Passwords do not match do not match')
+    if (newPassword !== confirmNewPassword) {
+      showError('Passwords do not match do not match');
       return;
     }
 
@@ -253,9 +258,14 @@ function UserEditor({ auth, showError, showSuccess }) {
       return;
     }
 
+    let path = `${process.env.REACT_APP_API_URL}/api/user/${userId}`
+    if (!userId) {
+      path = `${process.env.REACT_APP_API_URL}/api/user/me`
+    }
+ 
     setPending(true);
-
-    axios(`${process.env.REACT_APP_API_URL}/api/user/${userId}`, {
+    console.log(path)
+    axios(path, {
       method: 'get',
       headers: {
         authorization: `Bearer ${auth?.token}`,
@@ -271,9 +281,7 @@ function UserEditor({ auth, showError, showSuccess }) {
         setFullName(res.data.fullName);
         setFullNameDisplay(res.data.fullName);
         setRole(res.data.role);
-        console.log(res.data);
-        console.log('type: ', typeof role);
-        console.log('role: ', role);
+        
       })
       .catch((err) => {
         setPending(false);
@@ -297,7 +305,7 @@ function UserEditor({ auth, showError, showSuccess }) {
           showError(err.message);
         }
       });
-  }, [auth]);
+  }, [auth, userId]);
 
   return (
     <div className="text-light">
@@ -438,7 +446,7 @@ function UserEditor({ auth, showError, showSuccess }) {
               Need to change password?
             </button>
           </div>
-          <form id="restPasswordForm" className={displayPasswordChange ? "" : "d-none"}>
+          <form id="restPasswordForm" className={displayPasswordChange ? '' : 'd-none'}>
             <div>Password Reset</div>
             <div className="">
               <InputField

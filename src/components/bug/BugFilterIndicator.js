@@ -60,7 +60,8 @@ function BugFilterIndicator({ bugs }) {
 
   useEffect(() => {
     calcStats(bugs);
-  });
+    console.log('reload')
+  },);
 
   function calcStats(bugs) {
     if (bugs.length > 0) {
@@ -72,7 +73,6 @@ function BugFilterIndicator({ bugs }) {
       const openArray = _.filter(bugs, (x) => x.closed === false);
       const closedArray = _.filter(bugs, (x) => x.closed === true);
 
-      console.log(openArray);
 
       setApprovedCount(approvedArray.length);
       setApprovedPercent(((approvedCount / totalBugs) * 100).toFixed(2));

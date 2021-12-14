@@ -1,10 +1,10 @@
-.BugSummary {
+.BugListItem {
   color: var(--bs-dark);
   background-color: var(--bs-light);
 }
 
-.BugSummary:hover,
-.BugSummary:focus {
+.BugListItem:hover,
+.BugListItem:focus {
   cursor: pointer;
   color: var(--bs-light);
   background-color: var(--bs-dark);

@@ -20,6 +20,9 @@ function BugEditor({ auth, showError, showSuccess }) {
   const [pageLoadPending, setPageLoadPending] = useState(false);
   const [displayComments, setDisplayComments] = useState(false);
 
+
+  console.log('rerender')
+
   useEffect(() => {
     if (!auth) {
       return;

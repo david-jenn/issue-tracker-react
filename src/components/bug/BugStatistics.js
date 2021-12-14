@@ -25,7 +25,7 @@ function BugStatistics({ bugs }) {
   });
 
   function calcStats(bugs) {
-    console.log(bugs.length);
+   
     if (bugs.length > 0) {
       const totalBugs = bugs.length;
       const approvedArray = _.filter(bugs, (x) => x.classification === 'approved');
@@ -35,7 +35,7 @@ function BugStatistics({ bugs }) {
       const openArray = _.filter(bugs, (x) => x.closed === false);
       const closedArray = _.filter(bugs, (x) => x.closed === true);
 
-      console.log(openArray);
+    
 
       setApprovedCount(approvedArray.length);
       setApprovedPercent(((approvedCount / totalBugs) * 100).toFixed(2));

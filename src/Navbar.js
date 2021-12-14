@@ -1,18 +1,17 @@
 import { NavLink } from 'react-router-dom';
-import { FaDoorOpen, FaList } from "react-icons/fa";
+import { FaDoorOpen, FaList } from 'react-icons/fa';
 
 import './NavBar.css';
 
 function NavBar({ auth, onLogout }) {
-
   function onClickLogout(evt) {
     evt.preventDefault();
     onLogout();
   }
 
   return (
-    <header className="mb-3 position-sticky top-0">
-      <nav className="bg-secondary navbar navbar-dark   navbar-expand-sm p-3">
+    <header className=" position-sticky top-0">
+      <nav className="bg-secondary navbar navbar-dark navbar-expand-lg p-3">
         <div className="container-fluid">
           <NavLink className="navbar-brand" to="/">
             Issue Tracker
@@ -40,7 +39,7 @@ function NavBar({ auth, onLogout }) {
                   </NavLink>
                 </li>
               )}
-              
+
               {!auth && (
                 <li className="nav-item">
                   <NavLink className="nav-link" to="/register">
@@ -50,25 +49,33 @@ function NavBar({ auth, onLogout }) {
               )}
               {auth && (
                 <li className="nav-item">
-                <NavLink className="nav-link" to="/bug/report">
-                  Report Bug
-                </NavLink>
-              </li>
+                  <NavLink className="nav-link" to="/bug/report">
+                    Report Bug
+                  </NavLink>
+                </li>
               )}
               {auth && (
+                <li className="nav-item">
+                  <NavLink className="nav-link" to="/user/me" >
+                    Your Profile
+                  </NavLink>
+                </li>
+              )}
+              {auth?.payload?.permissions?.viewBug && (
                 <li className="nav-item">
                   <NavLink className="nav-link" to="/bug/list">
                     Bug List
                   </NavLink>
                 </li>
               )}
-              {auth && (
+              {auth?.payload?.permissions?.viewUser && (
                 <li className="nav-item">
                   <NavLink className="nav-link" to="/user/list">
                     User List
                   </NavLink>
                 </li>
               )}
+
               {auth && (
                 <li className="nav-item">
                   <NavLink className="nav-link" to="/login" onClick={(evt) => onClickLogout(evt)}>
@@ -77,7 +84,11 @@ function NavBar({ auth, onLogout }) {
                 </li>
               )}
             </ul>
+            {auth && <div className="ms-auto  "><NavLink className="fw-bold text-white text-decoration-none" to="/user/me">{auth.email}</NavLink></div>}
           </div>
+          
+            
+          
         </div>
       </nav>
     </header>

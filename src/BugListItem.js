@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom';
 import moment from 'moment';
 
-function BugSummary({ bug }) {
+import './BugListItem.css'
+
+function BugListItem({ bug }) {
   function getClassificationClasses() {
     const classes =
       bug.classification === 'unclassified'
@@ -65,4 +67,4 @@ function BugSummary({ bug }) {
   );
 }
 
-export default BugSummary;
+export default BugListItem;

@@ -70,10 +70,10 @@ function ReportBug({ auth, showError, showSuccess }) {
   }
 
   return (
-    <div className="p-3 ms-lg-5 me-lg-5">
+    <div className="">
       <h1>Report A New Bug</h1>
 
-      <form id="reportBugForm" className="row">
+      <form id="reportBugForm" className="row  ms-lg-5 me-lg-5">
         <InputField
           label="Title"
           id="bugEditor-title"

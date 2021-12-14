@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom';
 import moment from 'moment';
 
-import './UserSummary.css';
+import './UserListItem.css';
 import _ from 'lodash';
 
 
-function UserSummary({ user }) {
+function UserListItem({ user }) {
   function displayRoleBadges(user) {
     if (_.isArray(user.role) && user.role[0]) {
       return (
@@ -40,4 +40,4 @@ function UserSummary({ user }) {
   );
 }
 
-export default UserSummary;
+export default UserListItem;

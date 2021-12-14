@@ -4,9 +4,10 @@ import { nanoid } from 'nanoid';
 import axios from 'axios';
 
 import SelectField from './SelectField';
-import UserSummary from './UserSummary';
+import UserListItem from './UserListItem';
 
 function UserList({ auth, showError }) {
+ 
   const [pending, setPending] = useState(false);
   const [users, setUsers] = useState(null);
   const [error, setError] = useState('');
@@ -17,6 +18,7 @@ function UserList({ auth, showError }) {
   const [role, setRole] = useState('');
   const [sortBy, setSortBy] = useState('');
   const [rerenderCount, setRerenderCount] = useState(0);
+ 
 
   const [displayFilter, setDisplayFilter] = useState(false);
 
@@ -92,7 +94,7 @@ function UserList({ auth, showError }) {
   }
 
   return (
-    <div className="p-3">
+    <div className="">
       <h1 className="text-center mb-3">User List</h1>
       <form className="mb-3">
         <div className="input-group mb-3">
@@ -200,7 +202,7 @@ function UserList({ auth, showError }) {
           {users?.length > 0 && (
             <div>
               {_.map(users, (user) => (
-                <UserSummary key={user._id} user={user} />
+                <UserListItem key={user._id} user={user} />
               ))}
             </div>
           )}
