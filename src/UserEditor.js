@@ -2,6 +2,8 @@ import axios from 'axios';
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
+import { CgProfile } from 'react-icons/cg';
+
 import moment from 'moment';
 import _ from 'lodash';
 
@@ -10,10 +12,7 @@ import InputField from './InputField';
 import './UserEditor.css';
 
 function UserEditor({ auth, showError, showSuccess }) {
-  
   let { userId } = useParams();
-  
-  
 
   const [pending, setPending] = useState(false);
   const [error, setError] = useState('');
@@ -116,11 +115,11 @@ function UserEditor({ auth, showError, showSuccess }) {
     setRoleChangeSuccess('');
     setRoleChangeError('');
 
-    let path = `${process.env.REACT_APP_API_URL}/api/user/${userId}`
+    let path = `${process.env.REACT_APP_API_URL}/api/user/${userId}`;
     if (!userId) {
-      path = `${process.env.REACT_APP_API_URL}/api/user/me`
+      path = `${process.env.REACT_APP_API_URL}/api/user/me`;
     }
-    
+
     axios(path, {
       method: 'put',
       data: { givenName, familyName, fullName },
@@ -258,13 +257,13 @@ function UserEditor({ auth, showError, showSuccess }) {
       return;
     }
 
-    let path = `${process.env.REACT_APP_API_URL}/api/user/${userId}`
+    let path = `${process.env.REACT_APP_API_URL}/api/user/${userId}`;
     if (!userId) {
-      path = `${process.env.REACT_APP_API_URL}/api/user/me`
+      path = `${process.env.REACT_APP_API_URL}/api/user/me`;
     }
- 
+
     setPending(true);
-    console.log(path)
+    console.log(path);
     axios(path, {
       method: 'get',
       headers: {
@@ -281,7 +280,6 @@ function UserEditor({ auth, showError, showSuccess }) {
         setFullName(res.data.fullName);
         setFullNameDisplay(res.data.fullName);
         setRole(res.data.role);
-        
       })
       .catch((err) => {
         setPending(false);
@@ -308,7 +306,7 @@ function UserEditor({ auth, showError, showSuccess }) {
   }, [auth, userId]);
 
   return (
-    <div className="text-light">
+    <div className="">
       {pending && (
         <div className="spinner-border text-primary" role="status">
           <span className="visually-hidden">Loading...</span>
@@ -316,7 +314,9 @@ function UserEditor({ auth, showError, showSuccess }) {
       )}
       {!pending && (
         <div>
-          <h1>{fullNameDisplay}</h1>
+          <h1>
+            <CgProfile /> {fullNameDisplay}
+          </h1>
           {user.createdDate && <span>User created {moment(user.createdDate).fromNow()}</span>}
 
           <form id="editUserDetailsForm" className="border-bottom border-light row mb-3">
@@ -448,33 +448,36 @@ function UserEditor({ auth, showError, showSuccess }) {
           </div>
           <form id="restPasswordForm" className={displayPasswordChange ? '' : 'd-none'}>
             <div>Password Reset</div>
-            <div className="">
-              <InputField
-                label="Enter Old Password"
-                id="userOldPassword"
-                type="text"
-                value={oldPassword}
-                onChange={(evt) => onInputChange(evt, setOldPassword)}
-              />
+            <div className="row">
+              <div className="col-md-6">
+                <InputField
+                  label="Enter Old Password"
+                  id="userOldPassword"
+                  type="text"
+                  value={oldPassword}
+                  onChange={(evt) => onInputChange(evt, setOldPassword)}
+                />
+              </div>
+              <div className="col-md-6">
+                <InputField
+                  label="Enter New Password"
+                  id="userNewPassword"
+                  type="text"
+                  value={newPassword}
+                  onChange={(evt) => onInputChange(evt, setNewPassword)}
+                />
+              </div>
+              <div className="col-md-6">
+                <InputField
+                  label="Confirm New Password"
+                  id="userConfirmNewPassword"
+                  type="text"
+                  value={confirmNewPassword}
+                  onChange={(evt) => onInputChange(evt, setConfirmNewPassword)}
+                />
+              </div>
             </div>
-            <div className="">
-              <InputField
-                label="Enter New Password"
-                id="userNewPassword"
-                type="text"
-                value={newPassword}
-                onChange={(evt) => onInputChange(evt, setNewPassword)}
-              />
-            </div>
-            <div className="">
-              <InputField
-                label="Confirm New Password"
-                id="userConfirmNewPassword"
-                type="text"
-                value={confirmNewPassword}
-                onChange={(evt) => onInputChange(evt, setConfirmNewPassword)}
-              />
-            </div>
+
             <div>
               <button className="btn btn-primary me-3" onClick={(evt) => onSendPasswordChangeReq(evt)}>
                 Confirm Password Change

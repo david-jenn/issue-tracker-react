@@ -76,19 +76,20 @@ function CommentForm({ displayCommentForm, auth, showError, reRenderComments, sh
       <div className="d-flex">
         <div>
           <button type="button" className="btn btn-primary me-3" onClick={(evt) => onPostComment(evt)}>
+          
+            Post
+          </button>
+        </div>
+        <div>
+          <button type="button" className="btn btn-danger me-3" onClick={(evt) => displayCommentForm(evt)}>
+          
+            Cancel
+          </button>
           {pending && (
             <div className="spinner-border text-primary" role="status">
               <span className="visually-hidden">Loading...</span>
             </div>
           )}
-            Post
-          </button>
-        </div>
-        <div>
-          <button type="button" className="btn btn-danger" onClick={(evt) => displayCommentForm(evt)}>
-          
-            Cancel
-          </button>
           
         </div>
       </div>

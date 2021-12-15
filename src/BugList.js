@@ -3,15 +3,16 @@ import _ from 'lodash';
 import BugListItem from './BugListItem';
 import axios from 'axios';
 
+import { FaSearch } from 'react-icons/fa';
+import { HiOutlineClipboardList } from 'react-icons/hi';
 
 import SelectField from './SelectField';
 
 import BugStatistics from './components/bug/BugStatistics';
-import BugFilterIndicator from './components/bug/BugFilterIndicator';
+import BugFilterBar from './components/bug/BugFilterBar';
 import './BugList.css';
 
 function BugList({ auth, showError }) {
-  
   const [pending, setPending] = useState(false);
   const [bugs, setBugs] = useState(null);
   const [error, setError] = useState('');
@@ -27,7 +28,6 @@ function BugList({ auth, showError }) {
   const [closed, setClosed] = useState('');
   const [sortBy, setSortBy] = useState('');
   const [rerenderCount, setRerenderCount] = useState(0);
-  
 
   function onInputChange(evt, setValue) {
     const newValue = evt.currentTarget.value;
@@ -120,8 +120,11 @@ function BugList({ auth, showError }) {
 
   return (
     <div className="">
-      <h1 className="mb-3">Bug List</h1>
-      <form className="mb-3">
+      <h1 className="mb-3">
+        <HiOutlineClipboardList className="me-2" />
+        Bug List
+      </h1>
+      <form className="mb-1 searchForm">
         <div className="input-group mb-3">
           <input
             type="text"
@@ -131,20 +134,20 @@ function BugList({ auth, showError }) {
             value={keywords}
             onChange={(evt) => onInputChange(evt, setKeywords)}
           />
-          <button className="btn btn-primary" type="submit" id="button-addon2" onClick={(evt) => onSubmit(evt)}>
-            Search
+          <button className="btn btn-primary searchButton" type="submit" id="button-addon2" onClick={(evt) => onSubmit(evt)}>
+            <FaSearch />
           </button>
         </div>
         <div className="loadingRow d-flex align-content-center">
           <a
             href="/"
-            className="text-info fst-italic"
+            className="text-info fst-italic me-3"
             onClick={(evt) => toggleDisplay(evt, displayFilter, setDisplayFilter)}
           >
             show/hide filters
           </a>
           {pending && (
-            <div className="spinner-border text-primary" role="status">
+            <div className="spinner-border text-primary spinner" role="status">
               <span className="visually-hidden">Loading...</span>
             </div>
           )}
@@ -277,30 +280,38 @@ function BugList({ auth, showError }) {
             ]}
           />
         </div>
-        {bugs && <BugFilterIndicator bugs={bugs} />}
+        {bugs && <BugFilterBar bugs={bugs} />}
 
         <div className={displayStats ? 'bugSummariesSection col-md-9' : 'bugSummariesSection'}>
           {error && <div className="fs-3 text-danger">{error}</div>}
-          {displayStats && <div className="spacer"></div> }
-          {!displayStats && <div className="spacer text-right">
-            <div className="d-none d-md-flex justify-content-end">
-          <a
-              href="/"
-              className="text-info fst-italic mb-1"
-              onClick={(evt) => toggleDisplay(evt, displayStats, setDisplayStats)}
-            >
-              show/hide stats
-            </a>
+          {displayStats && <div className="spacer"></div>}
+
+          {!displayStats && (
+            <div className="spacer text-right">
+              <div className="d-none d-md-flex justify-content-end">
+                <a
+                  href="/"
+                  className="text-info fst-italic mb-1"
+                  onClick={(evt) => toggleDisplay(evt, displayStats, setDisplayStats)}
+                >
+                  show/hide stats
+                </a>
+              </div>
+              
+
             </div>
-          </div> }
-         { bugs && bugs.length > 0 && <div>
-            {_.map(bugs, (bug) => (
-              <BugListItem key={bug._id} bug={bug} />
-            ))}
-          </div> }
+          )}
+          
+          {bugs && bugs.length > 0 && (
+            <div>
+              {_.map(bugs, (bug) => (
+                <BugListItem key={bug._id} bug={bug} />
+              ))}
+            </div>
+          )}
           {bugs && bugs.length === 0 && <div className="border-bottom border-light fst-italic">No Bugs Found</div>}
         </div>
-        <div className={displayStats ? "col-md-3" : ""}>
+        <div className={displayStats ? 'col-md-3' : ''}>
           <div className="d-flex justify-content-end">
             <a
               href="/"

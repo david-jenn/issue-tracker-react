@@ -1,5 +1,8 @@
 import { NavLink } from 'react-router-dom';
-import { FaDoorOpen, FaList } from 'react-icons/fa';
+import { FaDoorOpen, FaDoorClosed, FaList, FaSearch,  } from 'react-icons/fa';
+import { CgProfile } from 'react-icons/cg'
+import { BsFillPersonPlusFill } from 'react-icons/bs'
+import { HiOutlineDocumentAdd, HiOutlineClipboardList } from 'react-icons/hi'
 
 import './NavBar.css';
 
@@ -43,6 +46,7 @@ function NavBar({ auth, onLogout }) {
               {!auth && (
                 <li className="nav-item">
                   <NavLink className="nav-link" to="/register">
+                  <BsFillPersonPlusFill className="m-1" />
                     Register
                   </NavLink>
                 </li>
@@ -50,20 +54,16 @@ function NavBar({ auth, onLogout }) {
               {auth && (
                 <li className="nav-item">
                   <NavLink className="nav-link" to="/bug/report">
+                  <HiOutlineDocumentAdd className="m-1" />
                     Report Bug
                   </NavLink>
                 </li>
               )}
-              {auth && (
-                <li className="nav-item">
-                  <NavLink className="nav-link" to="/user/me" >
-                    Your Profile
-                  </NavLink>
-                </li>
-              )}
+              
               {auth?.payload?.permissions?.viewBug && (
                 <li className="nav-item">
                   <NavLink className="nav-link" to="/bug/list">
+                  <HiOutlineClipboardList className="m-1" />
                     Bug List
                   </NavLink>
                 </li>
@@ -71,7 +71,17 @@ function NavBar({ auth, onLogout }) {
               {auth?.payload?.permissions?.viewUser && (
                 <li className="nav-item">
                   <NavLink className="nav-link" to="/user/list">
+                  <HiOutlineClipboardList className="m-1" />
                     User List
+                  </NavLink>
+                </li>
+              )}
+              {auth && (
+                <li className="nav-item">
+                  <NavLink className="nav-link" to="/user/me" >
+                  <CgProfile className="m-1" />
+                  
+                    Your Profile
                   </NavLink>
                 </li>
               )}
@@ -79,6 +89,7 @@ function NavBar({ auth, onLogout }) {
               {auth && (
                 <li className="nav-item">
                   <NavLink className="nav-link" to="/login" onClick={(evt) => onClickLogout(evt)}>
+                    <FaDoorClosed className="m-1" />
                     Logout
                   </NavLink>
                 </li>

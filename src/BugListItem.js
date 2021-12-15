@@ -1,9 +1,11 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import moment from 'moment';
 
 import './BugListItem.css'
 
 function BugListItem({ bug }) {
+  const navigate = useNavigate();
+
   function getClassificationClasses() {
     const classes =
       bug.classification === 'unclassified'
@@ -34,12 +36,14 @@ function BugListItem({ bug }) {
     return classes;
   }
 
+  
+
   return (
-    <div className="card border-light mb-2">
+    <div className="card border-light mb-2 listItem" onClick={(evt) => navigate(`/bug/${bug._id}`)}>
       <div className="card-body">
         <div className="title-badge-container d-md-flex justify-content-between">
           <div className="card-title">
-            <Link to={`/bug/${bug._id}`}>{bug.title}</Link>
+            <div className="text-primary text-decoration-underline">{bug.title}</div>
           </div>
           <div>
             <span className={getClassificationClasses()}>{bug.classification}</span>

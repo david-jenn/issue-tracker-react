@@ -21,7 +21,7 @@ function BugEditor({ auth, showError, showSuccess }) {
   const [displayComments, setDisplayComments] = useState(false);
 
 
-  console.log('rerender')
+
 
   useEffect(() => {
     if (!auth) {

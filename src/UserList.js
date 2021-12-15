@@ -3,8 +3,14 @@ import _ from 'lodash';
 import { nanoid } from 'nanoid';
 import axios from 'axios';
 
+import { FaSearch } from 'react-icons/fa'
+
+import { HiOutlineClipboardList } from 'react-icons/hi'
+
 import SelectField from './SelectField';
 import UserListItem from './UserListItem';
+
+import './UserList.css';
 
 function UserList({ auth, showError }) {
  
@@ -95,8 +101,8 @@ function UserList({ auth, showError }) {
 
   return (
     <div className="">
-      <h1 className="text-center mb-3">User List</h1>
-      <form className="mb-3">
+      <h1 className="mb-3"><HiOutlineClipboardList className="me-2"/>User List</h1>
+      <form className="mb-1">
         <div className="input-group mb-3">
           <input
             type="text"
@@ -106,15 +112,15 @@ function UserList({ auth, showError }) {
             onChange={(evt) => onInputChange(evt, setKeywords)}
           />
           <button className="btn btn-primary" type="button" id="button-addon2" onClick={(evt) => onSubmit(evt)}>
-            Search
+            <FaSearch />
           </button>
         </div>
         <div className="loadingRow d-flex align-content-center">
-          <a href="/" className="text-info" onClick={(evt) => toggleDisplayFilter(evt)}>
-            Show/Hide Filters
+          <a href="/" className="text-info fst-italic me-3" onClick={(evt) => toggleDisplayFilter(evt)}>
+            show/hide filters
           </a>
           {pending && (
-            <div className="spinner-border text-primary" role="status">
+            <div className="spinner-border text-primary spinner" role="status">
               <span className="visually-hidden">Loading...</span>
             </div>
           )}
@@ -122,36 +128,22 @@ function UserList({ auth, showError }) {
       </form>
 
       <div className=" filterListContainer d-flex row">
-        <div className={displayFilter ? 'filterContainer mb-3 col-md-3' : 'd-none'}>
+        <div className={displayFilter ? 'filterContainer mb-3 d-md-flex' : 'd-none'}>
           <SelectField
             label="Role"
             id="roleFilter"
             error=""
             onChange={(evt) => onInputChange(evt, setRole)}
             children={[
-              <option value="">All</option>,
-              <option value="DEV">DEV</option>,
-              <option value="QA">QA</option>,
-              <option value="BA">BA</option>,
-              <option value="PM">PM</option>,
-              <option value="TM">TM</option>,
+              <option key="all" value="">All</option>,
+              <option key="DEV" value="DEV">DEV</option>,
+              <option key="QA" value="QA">QA</option>,
+              <option key="BA" value="BA">BA</option>,
+              <option key="PM" value="PM">PM</option>,
+              <option key="TM" value="TM">TM</option>,
             ]}
           />
 
-          <SelectField
-            label="Role"
-            id="minAgeFilter"
-            error=""
-            onChange={(evt) => onInputChange(evt, setRole)}
-            children={[
-              <option value="">All</option>,
-              <option value="DEV">DEV</option>,
-              <option value="QA">QA</option>,
-              <option value="BA">BA</option>,
-              <option value="PM">PM</option>,
-              <option value="TM">TM</option>,
-            ]}
-          />
 
           <SelectField
             label="Min Age"
@@ -159,12 +151,12 @@ function UserList({ auth, showError }) {
             error=""
             onChange={(evt) => onInputChange(evt, setMinAge)}
             children={[
-              <option value="">All</option>,
-              <option value="1">1-day</option>,
-              <option value="7">7-days</option>,
-              <option value="30">30-days</option>,
-              <option value="60">60-days</option>,
-              <option value="90">90-days</option>,
+              <option key="all" value="">All</option>,
+              <option key="1" value="1">1-day</option>,
+              <option key="7" value="7">7-days</option>,
+              <option key="30" value="30">30-days</option>,
+              <option key="60" value="60">60-days</option>,
+              <option key="90" value="90">90-days</option>,
             ]}
           />
 
@@ -174,12 +166,12 @@ function UserList({ auth, showError }) {
             error=""
             onChange={(evt) => onInputChange(evt, setMaxAge)}
             children={[
-              <option value="">All</option>,
-              <option value="1">1-day</option>,
-              <option value="7">7-days</option>,
-              <option value="30">30-days</option>,
-              <option value="60">60-days</option>,
-              <option value="90">90-days</option>,
+              <option key="all" value="">All</option>,
+              <option key="1" value="1">1-day</option>,
+              <option key="7" value="7">7-days</option>,
+              <option key="30" value="30">30-days</option>,
+              <option key="60" value="60">60-days</option>,
+              <option key="90" value="90">90-days</option>,
             ]}
           />
 
@@ -189,16 +181,16 @@ function UserList({ auth, showError }) {
             error=""
             onChange={(evt) => onInputChange(evt, setSortBy)}
             children={[
-              <option value="givenName">Given Name</option>,
-              <option value="familyName">Family Name</option>,
-              <option value="role">Role</option>,
-              <option value="newest">Newest</option>,
-              <option value="oldest">Oldest</option>,
+              <option key="givenName" value="givenName">Given Name</option>,
+              <option key="familyName" value="familyName">Family Name</option>,
+              <option key="role" value="role">Role</option>,
+              <option key="newest" value="newest">Newest</option>,
+              <option key="oldest" value="oldest">Oldest</option>,
             ]}
           />
 
         </div>
-        <div className={displayFilter ? 'userSummariesSection col col-md-9 p-3' : 'userSummariesSection col p-3'}>
+        <div className={displayFilter ? 'userSummariesSection col p-3' : 'userSummariesSection col p-3'}>
           {users?.length > 0 && (
             <div>
               {_.map(users, (user) => (

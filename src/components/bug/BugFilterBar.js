@@ -7,9 +7,9 @@ import { AiFillWarning } from 'react-icons/ai';
 import { HiDuplicate } from 'react-icons/hi';
 import { GrStatusUnknown } from 'react-icons/gr';
 
-import './BugFilterIndicator.css';
+import './BugFilterBar.css';
 
-function BugFilterIndicator({ bugs }) {
+function BugFilterBar({ bugs }) {
   const [unclassifiedCount, setUnclassifiedCount] = useState(null);
   const [unclassifiedPercent, setUnclassifiedPercent] = useState(null);
 
@@ -22,10 +22,10 @@ function BugFilterIndicator({ bugs }) {
   const [duplicatePercent, setDuplicatePercent] = useState(null);
 
   const [openCount, setOpenCount] = useState(null);
-  const [openPercent, setOpenPercent] = useState(null);
+  
 
   const [closedCount, setClosedCount] = useState(null);
-  const [closedPercent, setClosedPercent] = useState(null);
+  
 
   const openIcon = (
     <div className="">
@@ -86,11 +86,7 @@ function BugFilterIndicator({ bugs }) {
       setDuplicateCount(duplicateArray.length);
       setDuplicatePercent(((duplicateCount / totalBugs) * 100).toFixed(1));
 
-      setOpenCount(openArray.length);
-      setOpenPercent(((openCount / totalBugs) * 100).toFixed(1));
-
-      setClosedCount(closedArray.length);
-      setClosedPercent(((closedCount / totalBugs) * 100).toFixed(1));
+     
     } else {
       setApprovedCount(0);
       setApprovedPercent(0);
@@ -101,9 +97,8 @@ function BugFilterIndicator({ bugs }) {
       setUnapprovedCount(0);
       setUnapprovedPercent(0);
       setOpenCount(0);
-      setOpenPercent(0);
       setClosedCount(0);
-      setClosedPercent(0);
+    
     }
   }
 
@@ -129,4 +124,4 @@ function BugFilterIndicator({ bugs }) {
   );
 }
 
-export default BugFilterIndicator;
+export default BugFilterBar;

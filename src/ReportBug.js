@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import _ from 'lodash';
 
+import { HiOutlineDocumentAdd } from 'react-icons/hi'
+
 import TextAreaField from './TextAreaField';
 import InputField from './InputField';
 
@@ -16,6 +18,7 @@ function ReportBug({ auth, showError, showSuccess }) {
   const [stepsToReproduce, setStepsToReproduce] = useState('');
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
+  const [newBugId, setNewBugId] = useState('');
   const [pending, setPending] = useState(false);
 
   function onInputChange(evt, setValue) {
@@ -46,8 +49,9 @@ function ReportBug({ auth, showError, showSuccess }) {
       .then((res) => {
         setSuccess(res.data.message);
         showSuccess(res.data.message);
+        setNewBugId(res.data.bugId);
         setPending(false);
-        navigate('/bug/list')
+        navigate(`/bug/${res.data.bugId}`);
       })
       .catch((err) => {
         setPending(false);
@@ -71,7 +75,7 @@ function ReportBug({ auth, showError, showSuccess }) {
 
   return (
     <div className="">
-      <h1>Report A New Bug</h1>
+      <h1><HiOutlineDocumentAdd /> Report A New Bug</h1>
 
       <form id="reportBugForm" className="row  ms-lg-5 me-lg-5">
         <InputField
@@ -106,9 +110,14 @@ function ReportBug({ auth, showError, showSuccess }) {
           <button id="submitBugReport" className="btn btn-primary me-3" onClick={(evt) => onReportBugReq(evt)}>
             Submit
           </button>
-          <button id="cancelBugReport" className="btn btn-danger">
+          <button id="cancelBugReport" className="btn btn-danger me-3">
             Cancel
           </button>
+          {pending && (
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      )}
         </div>
       </form>
     </div>

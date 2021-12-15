@@ -3,8 +3,8 @@
   background-color: var(--bs-light);
 }
 
-.BugListItem:hover,
-.BugListItem:focus {
+.listItem:hover,
+.listItem:focus {
   cursor: pointer;
   color: var(--bs-light);
   background-color: var(--bs-dark);

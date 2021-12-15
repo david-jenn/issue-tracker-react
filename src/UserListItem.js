@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import moment from 'moment';
 
 import './UserListItem.css';
@@ -6,6 +6,8 @@ import _ from 'lodash';
 
 
 function UserListItem({ user }) {
+  const navigate = useNavigate();
+
   function displayRoleBadges(user) {
     if (_.isArray(user.role) && user.role[0]) {
       return (
@@ -23,11 +25,11 @@ function UserListItem({ user }) {
   }
 
   return (
-    <div className="card border-light mb-2">
+    <div className="card border-light mb-2 listItem" onClick={(evt) => navigate(`/user/${user._id}`)}>
       <div className="card-body">
         <div className="titleContainer d-md-flex justify-content-between">
           <div className="card-title">
-            <Link to={`/user/${user._id}`}>{user.fullName}</Link>
+            <div className="text-primary text-decoration-underline">{user.fullName}</div>
           </div>
           <div>{displayRoleBadges(user)}</div>
         </div>

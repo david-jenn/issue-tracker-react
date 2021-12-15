@@ -1,8 +1,14 @@
-$palette1: #F5AD40;
-$palette2: #9C48E8;
-$palette3: #FF4942;
-$palette4: #2681D4;
-$palette5: #18F570;
+$palette1: #f7b34e;
+$palette2: #be86f3;
+$palette3: #c42f2a;
+$palette4: #56acfc;
+$palette5: #07d85b;
+
+
+$primary: $palette4;
+$danger: $palette3;
+$warning: $palette1;
+$success: $palette5;
 
 
 $font-family-base: "Open sans", sans-serif;
@@ -29,10 +35,8 @@ $font-family-header: "Raleway", sans-serif;
 @import "~bootstrap/scss/bootstrap";
 @import "~bootswatch/dist/superhero/bootswatch";
 
-// body {
-//   background-color: $dark;
-//   color: $light;
-// }
+
+
 h1, h2, h3, h4, h5, h6 {
   font-family: $font-family-header;
   //color: $light;
