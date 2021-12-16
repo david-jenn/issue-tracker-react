@@ -19,6 +19,15 @@ function BugEditor({ auth, showError, showSuccess }) {
   const [error, setError] = useState('');
   const [pageLoadPending, setPageLoadPending] = useState(false);
   const [displayComments, setDisplayComments] = useState(false);
+  const [assignedTo, setAssignedTo] = useState(null);
+  const [assignedOn, setAssignedOn] = useState()
+
+  function updateTitle(value) {
+    setTitleHolder(value);
+  }
+  function updateUserAssigned(value) {
+    
+  }
 
 
 
@@ -63,6 +72,8 @@ function BugEditor({ auth, showError, showSuccess }) {
     }
   }
 
+  
+
   return (
     <div className="section-container">
       {!auth && <h1 className="text-danger">You do not have permission</h1>}
@@ -89,6 +100,7 @@ function BugEditor({ auth, showError, showSuccess }) {
                     bug={bug}
                     showError={showError}
                     showSuccess={showSuccess}
+                    
                     onInputChange={onInputChange}
                   />
                 )}
@@ -128,9 +140,7 @@ function BugEditor({ auth, showError, showSuccess }) {
                   )}
                 </div>
               </div>
-              <div>Assigned to {}</div>
-
-              <div className="muteText">Assigned on 01/01/2021 by John Doe </div>
+           
             </div>
             <div className="testCaseCommentSection col-md-6  mb-3">
               <div className="testCaseSection border-bottom border-light mb-5">

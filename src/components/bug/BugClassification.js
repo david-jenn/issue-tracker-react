@@ -2,6 +2,7 @@ import _ from 'lodash';
 import axios from 'axios';
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router';
+import moment from 'moment';
 
 
 function BugClassification({bug, auth, onInputChange, showSuccess, showError }) {
@@ -12,10 +13,14 @@ function BugClassification({bug, auth, onInputChange, showSuccess, showError }) 
   const [pending, setPending] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('')
+  const [classifiedBy, setClassifiedBy] = useState(null);
+  const [classifiedOn, setClassifiedOn] = useState(null); 
   const canClassifyBug = auth?.payload?.permissions?.classifyBug;
 
   useEffect(() => {
     setClassification(bug?.classification);
+    setClassifiedBy(bug?.classifiedBy);
+    setClassifiedOn(bug?.classifiedOn);
   }, [bug, auth]);
 
   function onSendClassifyReq(evt) {
@@ -34,11 +39,13 @@ function BugClassification({bug, auth, onInputChange, showSuccess, showError }) 
     })
       .then((res) => {
         console.log(res);
-
+        setClassifiedOn(new Date());
+        setClassifiedBy(auth.payload)
         setPending(false);
         setSuccess(res.data.message);
 
         showSuccess(res.data.message);
+        console.log(classifiedBy);
       })
       .catch((err) => {
         console.log(err);
@@ -145,7 +152,7 @@ function BugClassification({bug, auth, onInputChange, showSuccess, showError }) 
       {success && <div className="text-success">{success}</div>}
       {error && <div className="text-danger">{error}</div>}
 
-      <div className="muteText">Classified on 01/01/2021 by John Doe</div>
+      <div className="muteText">Classified on {moment(classifiedOn).fromNow()} by {classifiedBy?.fullName}  </div>
     </form>
   );
 }

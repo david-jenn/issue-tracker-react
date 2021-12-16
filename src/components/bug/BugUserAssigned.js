@@ -8,8 +8,9 @@ import SelectField from '../../SelectField';
 function BugUserAssigned({ bug, auth, showError, showSuccess, onInputChange }) {
   const { bugId } = useParams();
 
-  const [assignedToId, setAssignedToId] = useState('');
-  const [assignedTo, setAssignedTo] = useState('');
+  const [assignedToId, setAssignedToId] = useState(null);
+  const [assignedTo, setAssignedTo] = useState(null);
+  const [assignedBy, setAssignedBy] = useState(null)
   const [users, setUsers] = useState(null);
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
@@ -24,6 +25,7 @@ function BugUserAssigned({ bug, auth, showError, showSuccess, onInputChange }) {
   useEffect(() => {
     setAssignedTo(bug?.assignedTo);
     setAssignedToId(bug?.assignedTo?._id);
+    setAssignedBy(bug?.assignedBy?.fullName);
 
     axios(`${process.env.REACT_APP_API_URL}/api/user/list`, {
       method: 'get',
@@ -63,11 +65,13 @@ function BugUserAssigned({ bug, auth, showError, showSuccess, onInputChange }) {
     })
       .then((res) => {
         console.log(res);
-
         setPending(false);
+        setAssignedBy(auth.payload.fullName);
         setAssignedTo(_.find(users, (x) => x._id === assignedToId));
         setSuccess(res.data.message);
         showSuccess(res.data.message);
+        console.log(assignedTo);
+        console.log(auth);
       })
       .catch((err) => {
         console.log(err);
@@ -103,6 +107,7 @@ function BugUserAssigned({ bug, auth, showError, showSuccess, onInputChange }) {
   }
 
   return (
+    <div>
     <form>
       <h3>Assigned User</h3>
       
@@ -141,6 +146,12 @@ function BugUserAssigned({ bug, auth, showError, showSuccess, onInputChange }) {
         </div>
       )}
     </form>
+    <div>Assigned to {assignedTo?.fullName} </div>
+
+    {( bug.assignedBy ||  assignedBy ) && <div className="muteText">Assigned on 01/01/2021 by {assignedBy}  </div> }
+    </div>
+
+
   );
 }
 

@@ -41,6 +41,7 @@ function BugDetails({ bug, onInputChange, auth, showSuccess, showError }) {
         console.log(res);
         showSuccess(res.data.message);
         setSuccess(res.data.message);
+       
       })
       .catch((err) => {
         setPending(false);

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router';
 import axios from 'axios';
 import _ from 'lodash';
+import moment from 'moment'
 
 
 function BugStatus({ bug, auth, onInputChange, showError, showSuccess }) {
@@ -11,11 +12,14 @@ function BugStatus({ bug, auth, onInputChange, showError, showSuccess }) {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  
+  const [closedBy, setClosedBy] = useState(null);
+  const [closedOn, setClosedOn] = useState(null);
   const canCloseBug = auth?.payload?.permissions?.closeBug;
 
   useEffect(() => {
     setClosed(bug?.closed);
+    setClosedBy(bug?.closedBy);
+    setClosedOn(bug?.closedOn);
   }, [bug, auth]);
 
   function onSendCloseReq(evt) {
@@ -36,6 +40,8 @@ function BugStatus({ bug, auth, onInputChange, showError, showSuccess }) {
       .then((res) => {
         console.log(res);
         setPending(false);
+        setClosedBy(auth.payload);
+        setClosedOn(new Date());
         setSuccess(res.data.message);
         showSuccess(res.data.message);
       })
@@ -63,6 +69,7 @@ function BugStatus({ bug, auth, onInputChange, showError, showSuccess }) {
   
 
   return (
+   
     <form id="bug-status-form" action="/issues" method="put">
       <h3>Status</h3>
       <div className="form-check">
@@ -115,8 +122,9 @@ function BugStatus({ bug, auth, onInputChange, showError, showSuccess }) {
         </div>
       )}
 
-      <div className="muteText">Closed on 01/01/2021 by John Doe</div>
+     {(bug.closed || closed) && <div className="muteText">Closed {moment(closedOn).fromNow()}</div>}
     </form>
+    
   );
 }
 
