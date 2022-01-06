@@ -8,7 +8,7 @@ import TextAreaField from '../../TextAreaField';
 import InputField from '../../InputField';
 
 
-function BugDetails({ bug, onInputChange, auth, showSuccess, showError }) {
+function BugDetails({ bug, onInputChange, auth, showSuccess, showError, updateTitle }) {
   const { bugId } = useParams();
 
   const [title, setTitle] = useState('');
@@ -41,6 +41,7 @@ function BugDetails({ bug, onInputChange, auth, showSuccess, showError }) {
         console.log(res);
         showSuccess(res.data.message);
         setSuccess(res.data.message);
+        updateTitle(title);
        
       })
       .catch((err) => {

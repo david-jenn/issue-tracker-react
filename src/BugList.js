@@ -117,7 +117,8 @@ function BugList({ auth, showError }) {
   useEffect(() => {
     fetchSearchResults();
   }, [auth, rerenderCount]);
-
+  
+ 
   return (
     <div className="">
       <h1 className="mb-3">

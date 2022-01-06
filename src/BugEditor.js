@@ -25,12 +25,7 @@ function BugEditor({ auth, showError, showSuccess }) {
   function updateTitle(value) {
     setTitleHolder(value);
   }
-  function updateUserAssigned(value) {
-    
-  }
-
-
-
+  
 
   useEffect(() => {
     if (!auth) {
@@ -100,7 +95,7 @@ function BugEditor({ auth, showError, showSuccess }) {
                     bug={bug}
                     showError={showError}
                     showSuccess={showSuccess}
-                    
+                    updateTitle={updateTitle}
                     onInputChange={onInputChange}
                   />
                 )}
