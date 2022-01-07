@@ -9,7 +9,7 @@ clientsClaim();
 
 // Configure the prefix and suffix for cache names.
 setCacheNameDetails({
-  prefix: 'my-react-app',  // replace with your app name
+  prefix: 'Issue Tracker',  // replace with your app name
   suffix: ''
 });
 
