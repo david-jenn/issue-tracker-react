@@ -52,7 +52,7 @@ function ReportBug({ auth, showError, showSuccess }) {
         showSuccess(res.data.message);
         setNewBugId(res.data.bugId);
         setPending(false);
-        navigate(`/bug/${res.data.bugId}`);
+        navigate(`/bug/list`);
       })
       .catch((err) => {
         setPending(false);
