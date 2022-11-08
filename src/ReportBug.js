@@ -47,6 +47,7 @@ function ReportBug({ auth, showError, showSuccess }) {
       },
     })
       .then((res) => {
+        console.log(res);
         setSuccess(res.data.message);
         showSuccess(res.data.message);
         setNewBugId(res.data.bugId);
